@@ -9,6 +9,14 @@ use Illuminate\Support\Facades\Storage;
 
 class BulletinController extends Controller
 {
+    /**
+     * Use Supabase in production while preserving the existing local public disk.
+     */
+    private function bulletinDisk(): string
+    {
+        return config('filesystems.default') === 'supabase' ? 'supabase' : 'public';
+    }
+
     public function index()
     {
         $bulletins = Bulletin::orderBy('published_date', 'desc')->paginate(10);
@@ -18,7 +26,7 @@ class BulletinController extends Controller
     public function download(Bulletin $bulletin)
     {
         $ext = pathinfo($bulletin->file_path, PATHINFO_EXTENSION);
-        return Storage::disk('public')->download($bulletin->file_path, $bulletin->title . '.' . $ext);
+        return Storage::disk($this->bulletinDisk())->download($bulletin->file_path, $bulletin->title . '.' . $ext);
     }
 
     public function show(Bulletin $bulletin)
@@ -32,7 +40,7 @@ class BulletinController extends Controller
     {
         abort_unless(strtolower(pathinfo($bulletin->file_path, PATHINFO_EXTENSION)) === 'pdf', 404);
 
-        $stream = Storage::disk('public')->readStream($bulletin->file_path);
+        $stream = Storage::disk($this->bulletinDisk())->readStream($bulletin->file_path);
         abort_unless(is_resource($stream), 404);
 
         $filename = \Illuminate\Support\Str::slug($bulletin->title).'.pdf';
@@ -70,7 +78,7 @@ class BulletinController extends Controller
             'published_date' => 'required|date',
         ]);
 
-        $path = $request->file('file')->storePublicly('bulletins', 'public');
+        $path = $request->file('file')->storePublicly('bulletins', $this->bulletinDisk());
 
         Bulletin::create([
             'title' => $validated['title'],
@@ -85,7 +93,7 @@ class BulletinController extends Controller
     public function destroy(Bulletin $bulletin)
     {
         LogService::log('delete_bulletin', $bulletin, ['title' => $bulletin->title]);
-        Storage::disk('public')->delete($bulletin->file_path);
+        Storage::disk($this->bulletinDisk())->delete($bulletin->file_path);
         $bulletin->delete();
         return back()->with('success', 'Bulletin deleted successfully.');
     }
