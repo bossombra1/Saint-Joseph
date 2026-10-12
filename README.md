@@ -1,8 +1,8 @@
-# Parish Website - Paroisse Saint-Joseph Artisan
+# Site web paroissial — Paroisse Saint-Joseph Artisan
 
-A full-featured Catholic parish management web application built for **Paroisse Saint-Joseph Artisan - Pacita**, San Pedro, Laguna. Provides mass schedules, mass intention submissions, event management, gallery, AI-powered chatbot, and a comprehensive admin panel.
+Application web de gestion et de communication paroissiale pour la **Paroisse Saint-Joseph Artisan, Riviera Bonoumin, Abidjan, Côte d’Ivoire**. Elle propose notamment les horaires de messe, les intentions de messe, les événements, la galerie, un chatbot IA et un espace d’administration.
 
-**Live:** [https://sto-rosario-parish.onrender.com](https://sto-rosario-parish.onrender.com)
+**Déploiement :** voir [DEPLOY_RENDER.md](DEPLOY_RENDER.md). L’adresse publique sera ajoutée après le premier déploiement réussi.
 
 ## Features
 
