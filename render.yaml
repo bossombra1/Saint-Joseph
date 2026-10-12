@@ -37,6 +37,8 @@ services:
         sync: false
       - key: DB_PORT
         value: "5432"
+      - key: DB_SSLMODE
+        value: require
       - key: DB_DATABASE
         sync: false
       - key: DB_USERNAME
