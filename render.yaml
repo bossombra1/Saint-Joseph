@@ -45,8 +45,9 @@ services:
         sync: false
       - key: DB_PASSWORD
         sync: false
+      # File cache avoids depending on the database cache table during boot.
       - key: CACHE_STORE
-        value: database
+        value: file
       - key: SESSION_DRIVER
         value: database
       - key: QUEUE_CONNECTION
