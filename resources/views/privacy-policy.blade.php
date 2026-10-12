@@ -1,6 +1,6 @@
 <x-public-layout>
 <x-slot name="meta">
-    <meta name="description" content="Privacy Policy for Sto. Rosario Parish – Pacita, San Pedro, Laguna website.">
+    <meta name="description" content="Privacy Policy for Paroisse Saint-Joseph Artisan – Riviera Bonoumin, Abidjan, Côte d'Ivoire website.">
 </x-slot>
 
 <section class="py-24 bg-[var(--cream)] section-pad-mobile section-pad-tablet">
@@ -13,7 +13,7 @@
 
         <div style="background:#fff;border-radius:20px;border:1px solid rgba(26,64,128,0.08);box-shadow:0 8px 32px rgba(13,42,82,0.06);padding:40px;" class="prose-content">
             <p style="color:var(--blue-deep);line-height:1.8;margin-bottom:20px;">
-                Sto. Rosario Parish ("we," "our," or "the Parish") operates this website to serve the Pacita, San Pedro, Laguna community. This policy explains what information we collect, why, and how it's handled.
+                Paroisse Saint-Joseph Artisan ("we," "our," or "the Parish") operates this website to serve the Riviera Bonoumin, Abidjan, Côte d'Ivoire community. This policy explains what information we collect, why, and how it's handled.
             </p>
 
             <h2 style="font-family:var(--font-heading,serif);font-weight:700;color:var(--blue-deep);font-size:1.3rem;margin-top:32px;margin-bottom:12px;">Information We Collect</h2>
@@ -63,9 +63,9 @@
                 If you have questions about this Privacy Policy or how your information is handled, please contact us:
             </p>
             <p style="color:var(--blue-deep);line-height:1.9;margin-top:8px;">
-                Sto. Rosario Parish<br>
-                1 Sto. Rosario Drive, Pacita, San Pedro, Laguna, Philippines 4023<br>
-                Email: officestorosarioparish@gmail.com<br>
+                Paroisse Saint-Joseph Artisan<br>
+                Paroisse St Joseph https://maps.app.goo.gl/ineJKGS5ux346zJR9<br>
+                Email: paroisse.stjoseph.bonoumin@gmail.com<br>
                 Phone: (02) 8869 2742
             </p>
         </div>

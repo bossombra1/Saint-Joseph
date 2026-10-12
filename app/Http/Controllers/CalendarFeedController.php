@@ -18,11 +18,11 @@ class CalendarFeedController extends Controller
         $lines[] = 'PRODID:-//StoRosarioParish//Calendar//EN';
         $lines[] = 'CALSCALE:GREGORIAN';
         $lines[] = 'METHOD:PUBLISH';
-        $lines[] = 'X-WR-CALNAME:Sto. Rosario Parish';
+        $lines[] = 'X-WR-CALNAME:Paroisse Saint-Joseph Artisan';
 
         $appUrl = config('app.url', 'http://localhost');
         $domain = parse_url($appUrl, PHP_URL_HOST) ?? 'storosario.ph';
-        $appName = config('app.name', 'Sto. Rosario Parish');
+        $appName = config('app.name', 'Paroisse Saint-Joseph Artisan');
 
         foreach ($events as $event) {
             $dtStart = \Carbon\Carbon::parse($event->event_date)->format('Ymd');

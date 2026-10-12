@@ -62,7 +62,7 @@
                     Back to Home
                 </a>
 
-                <a href="mailto:{{ config('services.parish.office_email', 'officestorosarioparish@gmail.com') }}"
+                <a href="mailto:{{ config('services.parish.office_email', 'paroisse.stjoseph.bonoumin@gmail.com') }}"
                    style="display:inline-flex; align-items:center; gap:8px;
                           height: 52px; padding: 0 28px; border-radius: 999px;
                           border: 1.5px solid rgba(13,42,82,0.18);

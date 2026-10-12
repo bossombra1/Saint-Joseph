@@ -24,8 +24,9 @@
                 @foreach($albums as $album)
                     <div class="gallery-card bg-white rounded-2xl border border-black/[.04] shadow-sm shadow-black/[.02] group overflow-hidden hover:shadow-lg hover:shadow-black/[.06] hover:border-black/[.08] transition-all duration-300 flex flex-col">
                         <div class="aspect-video bg-[#F5F7FA] relative overflow-hidden shrink-0">
-                            @if($album->images->count() > 0)
-                                <img src="{{ $album->images->first()->url }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+                            @if($album->images->first())
+                                <img src="{{ $album->images->first()->url }}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
                             @else
                                 <div class="w-full h-full flex flex-col items-center justify-center text-muted-foreground/20 gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" x2="22" y1="2" y2="22"/><path d="M10.41 10.41 2 18"/><path d="M8.13 8.13 11 5l9 9"/><path d="m16 16 4 4V8a2 2 0 0 0-2-2"/></svg>
@@ -38,7 +39,7 @@
                             <div class="absolute bottom-3 left-3">
                                 <span class="bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5 border border-white/10">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-                                    {{ $album->images_count }}
+                                    {{ $album->images_count ?? $album->images->count() }}
                                 </span>
                             </div>
                         </div>

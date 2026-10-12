@@ -35,5 +35,5 @@ Track Status Online
 
 {{ \App\Models\Setting::getValue('email_closing', 'Thank you for using Parish Portal!') }}<br>
 God bless,<br>
-**{{ \App\Models\Setting::getValue('email_signoff', 'Sto. Rosario Parish') }}**
+**{{ \App\Models\Setting::getValue('email_signoff', 'Paroisse Saint-Joseph Artisan') }}**
 </x-mail::message>

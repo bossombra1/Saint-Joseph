@@ -32,7 +32,7 @@ class ChatbotEvalCommand extends Command
     public function handle(AIService $aiService, RAGService $ragService, ChatbotTools $chatbotTools)
     {
         $this->info('=====================================================');
-        $this->info('       STO. ROSARIO PARISH CHATBOT EVAL SUITE        ');
+        $this->info('       Paroisse Saint-Joseph Artisan CHATBOT EVAL SUITE        ');
         $this->info('=====================================================');
         $this->newLine();
 

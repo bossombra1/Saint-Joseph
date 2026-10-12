@@ -1,6 +1,6 @@
-# Parish Website - Sto. Rosario Parish
+# Parish Website - Paroisse Saint-Joseph Artisan
 
-A full-featured Catholic parish management web application built for **Sto. Rosario Parish - Pacita**, San Pedro, Laguna. Provides mass schedules, mass intention submissions, event management, gallery, AI-powered chatbot, and a comprehensive admin panel.
+A full-featured Catholic parish management web application built for **Paroisse Saint-Joseph Artisan - Pacita**, San Pedro, Laguna. Provides mass schedules, mass intention submissions, event management, gallery, AI-powered chatbot, and a comprehensive admin panel.
 
 **Live:** [https://sto-rosario-parish.onrender.com](https://sto-rosario-parish.onrender.com)
 
@@ -56,7 +56,7 @@ A full-featured Catholic parish management web application built for **Sto. Rosa
 
 #### GA4 Measurement ID setup
 
-1. Google Analytics → Admin → **Create property** (e.g. "Sto. Rosario Parish Website").
+1. Google Analytics → Admin → **Create property** (e.g. "Paroisse Saint-Joseph Artisan Website").
 2. Admin → **Data Streams → Add stream → Web** → enter `https://sto-rosario-parish.onrender.com`.
 3. Copy the **Measurement ID** (format `G-XXXXXXXXXX`) from the stream page — this is your `GTM_ID`.
 4. On Render: service **Environment → Add Environment Variable** → `GTM_ID` = your ID → redeploy.

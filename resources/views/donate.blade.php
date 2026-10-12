@@ -1,6 +1,6 @@
 <x-public-layout>
     <x-slot name="meta">
-        <meta name="description" content="Support Sto. Rosario Parish. Give your tithes, digital offerings, and donations to help our church maintenance and community programs.">
+        <meta name="description" content="Support Paroisse Saint-Joseph Artisan. Give your tithes, digital offerings, and donations to help our church maintenance and community programs.">
         <style>
             @keyframes shimmer { 0%{background-position:-200% center} 100%{background-position:200% center} }
             @keyframes spin-slow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
@@ -333,7 +333,7 @@
 
                         <div style="background:rgba(245,197,24,0.06);border-radius:12px;padding:14px 18px;display:flex;align-items:flex-start;gap:10px;">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(245,197,24,0.8)" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                            <p style="font-size:12px;color:rgba(13,42,82,0.5);line-height:1.6;">Please send proof of transfer to <strong>{{ config('services.parish.office_email', 'officestorosarioparish@gmail.com') }}</strong> for acknowledgment.</p>
+                            <p style="font-size:12px;color:rgba(13,42,82,0.5);line-height:1.6;">Please send proof of transfer to <strong>{{ config('services.parish.office_email', 'paroisse.stjoseph.bonoumin@gmail.com') }}</strong> for acknowledgment.</p>
                         </div>
                     </div>
                 </div>

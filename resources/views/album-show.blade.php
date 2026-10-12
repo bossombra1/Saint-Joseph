@@ -1,6 +1,6 @@
 <x-public-layout>
 <x-slot name="meta">
-    <meta name="description" content="{{ $album->title }} – View photos and highlights from this album at Sto. Rosario Parish.">
+    <meta name="description" content="{{ $album->title }} – View photos and highlights from this album at Paroisse Saint-Joseph Artisan.">
     <style>
 
         .eyebrow {

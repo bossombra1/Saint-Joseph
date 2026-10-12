@@ -1,6 +1,6 @@
 <x-public-layout>
 <x-slot name="meta">
-    <meta name="description" content="Mass schedule at Sto. Rosario Parish – Pacita, San Pedro, Laguna. View weekly and special Mass times.">
+    <meta name="description" content="Mass schedule at Paroisse Saint-Joseph Artisan – Riviera Bonoumin, Abidjan, Côte d'Ivoire. View weekly and special Mass times.">
     <style>
         .eyebrow {
             font-size: 10px; font-weight: 600;
@@ -176,7 +176,7 @@
         <p class="animate-fade-up delay-2 font-heading"
            style="font-style:italic; color:rgba(253, 248, 172, 1); font-size:clamp(0.95rem,1.8vw,1.15rem);
                   font-weight:300; margin-bottom:0;">
-            Pacita Complex 1, San Pedro, Laguna
+            Riviera Bonoumin Cocody, Abidjan, Côte d'Ivoire
         </p>
     </div>
 
@@ -192,7 +192,7 @@
 <div x-data="{
     downloadICS(title, desc, start, end, loc, rrule = '') {
         let ics = [
-            'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Sto. Rosario Parish//EN',
+            'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Paroisse Saint-Joseph Artisan//EN',
             'BEGIN:VEVENT',
             'UID:' + Math.random().toString(36).substr(2,9) + '@storosario',
             'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z',
@@ -270,7 +270,7 @@
             $googleUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
                 .'&text='.urlencode('Mass: '.($s->title ?? 'Sto Rosario'))
                 .'&dates='.$dtStart.'/'.$dtEnd
-                .'&location='.urlencode('Sto. Rosario Parish, Pacita Complex 1, San Pedro, Laguna');
+                .'&location='.urlencode("Paroisse Saint-Joseph Artisan, Riviera Bonoumin Cocody, Abidjan, Côte d'Ivoire");
             if ($rrule) $googleUrl .= '&recur=RRULE:'.$rrule;
 
             // Image-specific mapping
@@ -329,7 +329,8 @@
                 <div class="flex flex-wrap gap-3">
                     @foreach($times as $t)
                     @php
-                        $label = is_array($t) ? \Carbon\Carbon::parse($t['time'] ?? '00:00')->format('g:i A') : \Carbon\Carbon::parse($t)->format('g:i A');
+                        $timeFormat = app()->getLocale() === 'fr' ? 'H\hi' : 'g:i A';
+                        $label = is_array($t) ? \Carbon\Carbon::parse($t['time'] ?? '00:00')->format($timeFormat) : \Carbon\Carbon::parse($t)->format($timeFormat);
                     @endphp
                     <div class="time-chip">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -356,7 +357,7 @@
                         <a href="{{ $googleUrl }}" target="_blank" class="p-2 rounded-full border border-border text-muted-foreground hover:border-primary hover:text-primary transition-all" title="Add to Google">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4"/></svg>
                         </a>
-                        <button @click="downloadICS('Mass: {{ addslashes($s->title ?? 'Sto Rosario') }}', 'Regular mass schedule', '{{ $dtStart }}','{{ $dtEnd }}', 'Sto. Rosario Parish', '{{ $rrule }}')" 
+                        <button @click="downloadICS('Mass: {{ addslashes($s->title ?? 'Sto Rosario') }}', 'Regular mass schedule', '{{ $dtStart }}','{{ $dtEnd }}', 'Paroisse Saint-Joseph Artisan', '{{ $rrule }}')" 
                                 class="p-2 rounded-full border border-border text-muted-foreground hover:border-primary hover:text-primary transition-all" title="Download iCal">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                         </button>
@@ -385,10 +386,10 @@
         <div>
             <p class="eyebrow mb-2">Note for Special Masses</p>
             <p style="font-size:13px; color:rgba(13,42,82,0.52); line-height:1.8;">
-                Mass times for holy days of obligation, feast days, and other special occasions may vary.
-                Follow our announcements or social media pages for the most up-to-date information.
+                <span>Mass times for holy days of obligation, feast days, and other special occasions may vary.</span>
+                <span>Follow our announcements or social media pages for the most up-to-date information.</span>
             </p>
-            <a href="https://www.facebook.com/storosarioparishpacita1" target="_blank" rel="noopener noreferrer"
+            <a href="https://www.facebook.com/saintjosephartisanrivierabonoumin?locale=fr_FR" target="_blank" rel="noopener noreferrer"
                class="inline-flex items-center gap-2 mt-3 px-5 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest transition-all hover:-translate-y-0.5"
                style="border:1px solid rgba(245,197,24,0.35); color:var(--blue-deep); background:rgba(245,197,24,0.06); text-decoration:none;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>

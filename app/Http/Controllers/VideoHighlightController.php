@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\VideoHighlight;
 use App\Services\LogService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -31,8 +32,8 @@ class VideoHighlightController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'video_file' => 'nullable|file|mimes:mp4,mov,ogv|max:102400', // 100MB
-            'video_url' => 'nullable|string|max:500',
+            'video_file' => 'nullable|file|mimes:mp4,mov,ogv,webm|max:102400|required_without:video_url',
+            'video_url' => 'nullable|string|max:500|required_without:video_file',
             'is_published' => 'boolean',
         ]);
 
@@ -40,8 +41,11 @@ class VideoHighlightController extends Controller
 
         if ($request->hasFile('video_file')) {
             $file = $request->file('video_file');
-            $filename = time() . '_' . Str::slug($request->title) . '.' . $file->getClientOriginalExtension();
+            $filename = Str::uuid() . '.' . strtolower($file->getClientOriginalExtension());
             $path = $file->storeAs('highlights', $filename);
+            if (! $path) {
+                return back()->withErrors(['video_file' => 'The uploaded video could not be saved.'])->withInput();
+            }
             $videoUrl = $filename; // Store the filename/path
         }
 
@@ -54,6 +58,7 @@ class VideoHighlightController extends Controller
         ]);
 
         LogService::log('create_highlight', null, ['title' => $request->title]);
+        Cache::forget('gallery_highlights');
         return redirect()->route('admin.highlights.index')->with('success', 'Video Highlight created successfully!');
     }
 
@@ -67,7 +72,7 @@ class VideoHighlightController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'video_file' => 'nullable|file|mimes:mp4,mov,ogv|max:102400', // 100MB
+            'video_file' => 'nullable|file|mimes:mp4,mov,ogv,webm|max:102400',
             'video_url' => 'nullable|string|max:500',
             'is_published' => 'boolean',
         ]);
@@ -78,12 +83,15 @@ class VideoHighlightController extends Controller
             // Delete old file if exists (using the raw database value)
             $oldPath = $highlight->getRawOriginal('video_path');
             if ($oldPath && !Str::startsWith($oldPath, ['http', 'www'])) {
-                Storage::delete('highlights/' . $oldPath);
+                Storage::disk(config('filesystems.default'))->delete('highlights/' . $oldPath);
             }
 
             $file = $request->file('video_file');
-            $filename = time() . '_' . Str::slug($request->title) . '.' . $file->getClientOriginalExtension();
+            $filename = Str::uuid() . '.' . strtolower($file->getClientOriginalExtension());
             $path = $file->storeAs('highlights', $filename);
+            if (! $path) {
+                return back()->withErrors(['video_file' => 'The uploaded video could not be saved.'])->withInput();
+            }
             $videoUrl = $filename;
         }
 
@@ -95,6 +103,7 @@ class VideoHighlightController extends Controller
         ]);
 
         LogService::log('update_highlight', $highlight, ['title' => $highlight->title]);
+        Cache::forget('gallery_highlights');
         return redirect()->route('admin.highlights.index')->with('success', 'Video Highlight updated successfully!');
     }
 
@@ -103,9 +112,10 @@ class VideoHighlightController extends Controller
         LogService::log('delete_highlight', $highlight, ['title' => $highlight->title]);
         $oldPath = $highlight->getRawOriginal('video_path');
         if ($oldPath && !Str::startsWith($oldPath, ['http', 'www'])) {
-            Storage::delete('highlights/' . $oldPath);
+            Storage::disk(config('filesystems.default'))->delete('highlights/' . $oldPath);
         }
         $highlight->delete();
+        Cache::forget('gallery_highlights');
         return back()->with('success', 'Video Highlight deleted successfully!');
     }
 

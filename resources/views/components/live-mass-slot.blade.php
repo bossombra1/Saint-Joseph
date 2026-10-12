@@ -1,6 +1,7 @@
 @props(['nextMass' => null])
 
 @php
+    $isFrench = app()->getLocale() === 'fr';
     $now = \Carbon\Carbon::now('Asia/Manila');
     $isSunday = $now->dayOfWeek === \Carbon\Carbon::SUNDAY;
     $liveStart = $now->copy()->setTime(9, 55);
@@ -21,7 +22,7 @@
         <div class="px-6 md:px-10 py-5 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <span class="h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse shadow-lg shadow-red-500/40"></span>
-                <span class="font-cinzel font-semibold text-xs tracking-[.25em] uppercase text-white/80">Live Mass</span>
+                <span class="font-cinzel font-semibold text-xs tracking-[.25em] uppercase text-white/80">{{ $isFrench ? 'Messe en direct' : 'Live Mass' }}</span>
             </div>
             @if($livePlatform === 'both')
             <div class="flex items-center gap-1 bg-white/10 rounded-lg p-0.5 border border-white/10">
@@ -55,12 +56,12 @@
                     @else
                         <div class="flex flex-col items-center justify-center h-full text-center px-6" x-show="true">
                             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                            <p class="text-white/50 text-sm font-medium mt-3 mb-4">Watch live on our Facebook page</p>
+                            <p class="text-white/50 text-sm font-medium mt-3 mb-4">{{ $isFrench ? 'Suivez la messe en direct sur notre page Facebook' : 'Watch live on our Facebook page' }}</p>
                             <a href="{{ config('services.parish.facebook_page_url') }}" target="_blank" rel="noopener"
                                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95"
                                style="background:#1877F2;color:#fff;">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                                Open Facebook
+                                {{ $isFrench ? 'Ouvrir Facebook' : 'Open Facebook' }}
                             </a>
                         </div>
                     @endif
@@ -91,17 +92,15 @@
                     <div>
                         <div class="eyebrow-row flex items-center gap-3 mb-2">
                             <span style="display:inline-block;height:1px;width:32px;background:linear-gradient(90deg,transparent,rgba(245,197,24,.6));"></span>
-                            <span class="eyebrow" style="color:rgba(235,242,255,.7);">NEXT MASS</span>
+                            <span class="eyebrow" style="color:rgba(235,242,255,.7);">{{ $isFrench ? 'PROCHAINE MESSE' : 'NEXT MASS' }}</span>
                             <span style="display:inline-block;height:1px;width:32px;background:linear-gradient(90deg,rgba(245,197,24,.6),transparent);"></span>
                         </div>
                         @if($nextMass)
                         <h2 class="font-heading font-bold italic leading-none" style="font-size:clamp(2.2rem,4vw,3.6rem);color:#fff;letter-spacing:-.01em;">{{ $nextMass->calculated_day }}</h2>
                         <p class="font-heading font-bold italic" style="font-size:clamp(1.8rem,3.5vw,3rem);color:#F5C518;line-height:1.1;">{{ $nextMass->calculated_time }}</p>
-                        <p style="font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:rgba(235,242,255,.5);margin-top:6px;">{{ strtoupper($nextMass->title ?? ($nextMass->mass_type === 'sunday' ? 'Sunday Mass' : 'Weekday Mass')) }}</p>
+                        <p style="font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:rgba(235,242,255,.5);margin-top:6px;">{{ mb_strtoupper($nextMass->title ?? ($nextMass->mass_type === 'sunday' ? ($isFrench ? 'Messe du dimanche' : 'Sunday Mass') : ($isFrench ? 'Messe en semaine' : 'Weekday Mass')), 'UTF-8') }}</p>
                         @else
-                        <h2 class="font-heading font-bold italic leading-none" style="font-size:3.6rem;color:#fff;">Sunday</h2>
-                        <p class="font-heading font-bold italic" style="font-size:3rem;color:#F5C518;line-height:1.1;">6:00 AM</p>
-                        <p style="font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:rgba(235,242,255,.5);margin-top:6px;">SUNDAY MASS</p>
+                        <h2 class="font-heading font-bold italic leading-none" style="font-size:2rem;color:#fff;">{{ $isFrench ? 'Aucune messe à venir' : 'No upcoming Mass' }}</h2>
                         @endif
                     </div>
                 </div>
@@ -114,16 +113,16 @@
                     <span style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,0,.3));"></span>
                     <div class="flex items-center gap-2">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        <span class="font-cinzel" style="font-size:12.5px;letter-spacing:.3em;color:var(--blue-deep);font-weight:600;">OFFICE HOURS</span>
+                        <span class="font-cinzel" style="font-size:12.5px;letter-spacing:.3em;color:var(--blue-deep);font-weight:600;">{{ $isFrench ? 'HORAIRES DU SECRÉTARIAT' : 'OFFICE HOURS' }}</span>
                     </div>
                     <span style="flex:1;height:1px;background:linear-gradient(90deg,rgba(201,162,0,.3),transparent);"></span>
                 </div>
 
                 <div class="office-cols grid grid-cols-1 md:grid-cols-3 gap-5" style="border-radius:16px;">
                     @foreach([
-                        ['icon'=>'<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>','day'=>'· TUE – SAT ·','hours'=>['6:00 AM – 12:00 NN','1:30 PM – 6:00 PM'],'closed'=>false],
-                        ['icon'=>'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>','day'=>'· SUNDAY ·','hours'=>['6:00 AM – 12:00 NN','3:00 PM – 6:00 PM'],'closed'=>false],
-                        ['icon'=>'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>','day'=>'· MONDAY ·','hours'=>[],'closed'=>true],
+                        ['icon'=>'<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>','day'=>$isFrench ? '· MAR. – SAM. ·' : '· TUE – SAT ·','hours'=>$isFrench ? ['06:00 – 12:00','13:30 – 18:00'] : ['6:00 AM – 12:00 NN','1:30 PM – 6:00 PM'],'closed'=>false],
+                        ['icon'=>'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>','day'=>$isFrench ? '· DIMANCHE ·' : '· SUNDAY ·','hours'=>$isFrench ? ['06:00 – 12:00','15:00 – 18:00'] : ['6:00 AM – 12:00 NN','3:00 PM – 6:00 PM'],'closed'=>false],
+                        ['icon'=>'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>','day'=>$isFrench ? '· LUNDI ·' : '· MONDAY ·','hours'=>[],'closed'=>true],
                     ] as $ohCol)
                     <div class="office-col flex flex-col items-center py-7 px-4 text-center bg-white rounded-2xl shadow-sm border border-[rgba(26,64,128,0.07)]">
                         <br>
@@ -132,7 +131,7 @@
                         </div>
                         <p style="font-size:11.5px;letter-spacing:.2em;color:rgba(13,42,82,.45);font-weight:500;margin-bottom:10px;">{{ $ohCol['day'] }}</p>
                         @if($ohCol['closed'])
-                        <p class="font-cinzel font-semibold" style="color:#C9A200;font-size:.8rem;letter-spacing:.08em;">CLOSED</p>
+                        <p class="font-cinzel font-semibold" style="color:#C9A200;font-size:.8rem;letter-spacing:.08em;">{{ $isFrench ? 'FERMÉ' : 'CLOSED' }}</p>
                         @else
                         @foreach($ohCol['hours'] as $ohHour)
                         <p style="font-size:14.5px;color:var(--blue-deep);line-height:1.9;">{{ $ohHour }}</p>

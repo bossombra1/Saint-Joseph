@@ -1,6 +1,6 @@
 <x-public-layout>
     <x-slot name="meta">
-        <meta name="description" content="Thank you for your generous donation to Sto. Rosario Parish.">
+        <meta name="description" content="Thank you for your generous donation to Paroisse Saint-Joseph Artisan.">
         <style>
             @keyframes confetti-fall {
                 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }

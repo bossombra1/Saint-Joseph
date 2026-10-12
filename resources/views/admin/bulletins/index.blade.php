@@ -19,22 +19,22 @@
                 <form action="{{ route('admin.bulletins.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
                     @csrf
                     <div class="space-y-1.5">
-                        <label class="block text-[10px] font-black uppercase tracking-[.15em] text-muted-foreground/50">Bulletin Title</label>
-                        <input type="text" name="title" required 
+                        <label for="bulletin-title" class="block text-[10px] font-black uppercase tracking-[.15em] text-muted-foreground/50">Bulletin Title</label>
+                        <input id="bulletin-title" type="text" name="title" required 
                             class="w-full px-4 py-2.5 rounded-xl bg-[#F5F7FA] border border-black/[.06] focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all text-sm font-bold"
                             placeholder="e.g. Easter Sunday 2026">
                         @error('title') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div class="space-y-1.5">
-                        <label class="block text-[10px] font-black uppercase tracking-[.15em] text-muted-foreground/50">Publish Date</label>
-                        <input type="date" name="published_date" required 
+                        <label for="bulletin-published-date" class="block text-[10px] font-black uppercase tracking-[.15em] text-muted-foreground/50">Publish Date</label>
+                        <input id="bulletin-published-date" type="date" name="published_date" required 
                             class="w-full px-4 py-2.5 rounded-xl bg-[#F5F7FA] border border-black/[.06] focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all text-sm font-bold"
                             value="{{ date('Y-m-d') }}">
                         @error('published_date') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div class="space-y-1.5">
-                        <label class="block text-[10px] font-black uppercase tracking-[.15em] text-muted-foreground/50">PDF or Image File</label>
-                        <input type="file" name="file" accept="application/pdf,image/*" required 
+                        <label for="bulletin-file" class="block text-[10px] font-black uppercase tracking-[.15em] text-muted-foreground/50">Bulletin PDF or image</label>
+                        <input id="bulletin-file" type="file" name="file" accept="application/pdf,image/*" required 
                             class="w-full text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary file:text-white hover:file:bg-primary/90 cursor-pointer">
                         @error('file') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -65,7 +65,7 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                             <a href="{{ Storage::url($bulletin->file_path) }}" target="_blank" class="p-2 rounded-xl text-muted-foreground/40 hover:text-primary hover:bg-[#F5F7FA] transition-all">
+                             <a href="{{ $isPdf ? route('admin.bulletins.preview', $bulletin) : Storage::url($bulletin->file_path) }}" target="_blank" rel="noopener" aria-label="{{ $isPdf ? 'Preview bulletin '.$bulletin->title : 'Open bulletin image '.$bulletin->title }}" class="p-2 rounded-xl text-muted-foreground/40 hover:text-primary hover:bg-[#F5F7FA] transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12c-1.8 0-4.5 2.7-4.5 4.5V20" /><path d="M3 12c1.8 0 4.5-2.7 4.5-4.5V4" /><path d="M12 3v18" /><path d="M3 12h18" /></svg>
                             </a>
                             <form :id="'delete-bulletin-{{ $bulletin->id }}'" action="{{ route('admin.bulletins.destroy', $bulletin) }}" method="POST">

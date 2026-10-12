@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class GalleryImage extends Model
 {
@@ -35,7 +37,22 @@ class GalleryImage extends Model
 
     public function getUrlAttribute()
     {
-        return \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url('gallery/' . $this->storage_path);
+        $diskName = config('filesystems.default');
+        $path = 'gallery/' . $this->storage_path;
+        $disk = Storage::disk($diskName);
+
+        // Le disque "local" est privé : sa route /storage/{path} exige une URL signée.
+        // URL relative (sans hôte) pour fonctionner quel que soit l'hôte/port (ex. 127.0.0.1:8000).
+        if ($diskName === 'local') {
+            return URL::temporarySignedRoute(
+                'storage.local',
+                now()->addDays(7),
+                ['path' => $path],
+                absolute: false
+            );
+        }
+
+        return $disk->url($path);
     }
 
     /**

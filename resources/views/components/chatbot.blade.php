@@ -39,7 +39,7 @@
                     }"></span>
             </div>
             <div>
-                <h3 class="font-extrabold text-sm leading-none tracking-wide">Sto. Rosario Parish AI</h3>
+                <h3 class="font-extrabold text-sm leading-none tracking-wide">Paroisse Saint-Joseph Artisan AI</h3>
                 <p class="text-[9px] mt-1.5 uppercase tracking-widest font-extrabold flex items-center gap-1"
                    :class="{
                         'text-emerald-300': liveAgentStatus === 'none' || liveAgentStatus === 'suggesting',
@@ -237,7 +237,7 @@
 
                 async pushWelcome() {
                     if (this.messages.length > 0) return;
-                    this.messages.push(this._makeMsg('assistant', 'Peace be with you! Welcome to Sto. Rosario Parish. I\'m here to help with anything — Mass schedules, intentions, sacraments, events, donations, or just about the faith. What\'s on your mind?'));
+                    this.messages.push(this._makeMsg('assistant', 'Peace be with you! Welcome to Paroisse Saint-Joseph Artisan. I\'m here to help with anything — Mass schedules, intentions, sacraments, events, donations, or just about the faith. What\'s on your mind?'));
                     this.currentSuggestions = [
                         '⛪ Mass Schedules',
                         '🕯️ Offer Mass Intention',
@@ -454,7 +454,7 @@
                             if (data.status === 'resolved' && prevStatus !== 'resolved') {
                                 this.liveAgentStatus = 'none';
                                 this._resolved = true;
-                                this.messages.push(this._makeMsg('assistant', 'This conversation has been resolved. Thank you for reaching out to Sto. Rosario Parish! Feel free to start a new conversation anytime.', 'system'));
+                                this.messages.push(this._makeMsg('assistant', 'This conversation has been resolved. Thank you for reaching out to Paroisse Saint-Joseph Artisan! Feel free to start a new conversation anytime.', 'system'));
                                 this.scrollToBottom();
                                 if (this.pollInterval) clearInterval(this.pollInterval);
                             }
@@ -492,10 +492,10 @@
                     if (!timestamp) return '';
                     const d = new Date(timestamp);
                     const now = new Date();
-                    const time = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+                    const time = d.toLocaleTimeString(document.documentElement.lang, { hour: 'numeric', minute: '2-digit' });
                     // Show date if not today
                     if (d.toDateString() !== now.toDateString()) {
-                        return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ', ' + time;
+                        return d.toLocaleDateString(document.documentElement.lang, { month: 'short', day: 'numeric' }) + ', ' + time;
                     }
                     return time;
                 },

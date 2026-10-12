@@ -161,6 +161,9 @@ set -e
 echo "Running database migrations..."
 php artisan migrate --force
 
+echo "Linking public storage..."
+php artisan storage:link
+
 echo "Optimizing Laravel..."
 php artisan optimize
 

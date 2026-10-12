@@ -1,9 +1,18 @@
 <x-admin-layout>
     @php
         $disk = config('filesystems.default') === 'local' ? 'public' : config('filesystems.default');
-        $qrUrl = isset($settings['qr_code']) ? \Illuminate\Support\Facades\Storage::disk($disk)->url($settings['qr_code']) : null;
-        $priestUrl = isset($settings['priest_image']) ? \Illuminate\Support\Facades\Storage::disk($disk)->url($settings['priest_image']) : null;
-        $assistantPriestUrl = isset($settings['assistant_priest_image']) ? \Illuminate\Support\Facades\Storage::disk($disk)->url($settings['assistant_priest_image']) : null;
+        $settingsImageUrl = static function (?string $path) use ($disk): ?string {
+            if (! $path) {
+                return null;
+            }
+
+            return config('filesystems.default') === 'local'
+                ? '/storage/'.ltrim($path, '/')
+                : \Illuminate\Support\Facades\Storage::disk($disk)->url($path);
+        };
+        $qrUrl = $settingsImageUrl($settings['qr_code'] ?? null);
+        $priestUrl = $settingsImageUrl($settings['priest_image'] ?? null);
+        $assistantPriestUrl = $settingsImageUrl($settings['assistant_priest_image'] ?? null);
 
         $contactRaw = $settings['parish_contact'] ?? '';
         $contactNumbers = is_string($contactRaw) && $contactRaw !== ''
@@ -24,7 +33,7 @@
             'years' => $e['years'] ?? '',
             'quote' => $e['quote'] ?? '',
             'image' => $e['image'] ?? '',
-            'imageUrl' => ! empty($e['image']) ? \Illuminate\Support\Facades\Storage::disk($disk)->url($e['image']) : null,
+            'imageUrl' => $settingsImageUrl($e['image'] ?? null),
             'contrib_short' => $e['contrib_short'] ?? '',
             'contrib_full' => $e['contrib_full'] ?? '',
             'contrib_confirmed' => $e['contrib_confirmed'] ?? false,
@@ -118,7 +127,7 @@
         </form>
 
         {{-- Donations --}}
-        <form id="section-donations" action="{{ route('admin.settings.section.update', 'donations') }}" method="POST" enctype="multipart/form-data" x-data="settingsSection()" @submit="$root.revokePreviews()">
+        <form id="section-donations" action="{{ route('admin.settings.section.update', 'donations') }}" method="POST" enctype="multipart/form-data" x-data="settingsSection()">
             @csrf
             <x-admin-card>
                 <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Donation & Payments</h3>
@@ -138,11 +147,11 @@
                         <input type="hidden" name="remove_qr" value="0">
                         <div class="flex items-center gap-6 p-4 bg-muted/10 rounded-xl border border-dashed">
                             <div class="h-32 w-32 shrink-0 rounded bg-white border shadow-sm flex items-center justify-center overflow-hidden">
-                                <template x-if="$root.qrPreview"><img :src="$root.qrPreview" class="h-full w-full object-contain" /></template>
-                                <template x-if="!$root.qrPreview"><span class="text-muted-foreground text-[10px] uppercase font-black text-center px-4">No QR</span></template>
+                                <template x-if="qrPreview"><img :src="qrPreview" class="h-full w-full object-contain" /></template>
+                                <template x-if="!qrPreview"><span class="text-muted-foreground text-[10px] uppercase font-black text-center px-4">No QR</span></template>
                             </div>
                             <div class="flex-1">
-                                <input type="file" name="qr_code" accept="image/*" @change="$root.handleFileUpload($event, 'qrPreview', 'QR Code image')"
+                                <input type="file" name="qr_code" accept="image/*" @change="handleFileUpload($event, 'qrPreview', 'QR Code image')"
                                     class="w-full text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white">
                                 <p class="mt-2 text-[10px] text-muted-foreground">Max 1.8MB (JPG/PNG). Leave empty to keep current.</p>
                                 @if(!empty($settings['qr_code']))
@@ -151,7 +160,7 @@
                                     message: 'This will remove the current QR code from the donation page. You can upload a new one later.',
                                     confirmText: 'Remove',
                                     type: 'danger',
-                                    onConfirm: () => { $root.qrPreview = null; $el.closest('form').querySelector('[name=remove_qr]').value = '1'; $store.toast.trigger('QR code marked for removal. Save to apply.', 'success'); }
+                                    onConfirm: () => { qrPreview = null; $el.closest('form').querySelector('[name=remove_qr]').value = '1'; $store.toast.trigger('QR code marked for removal. Save to apply.', 'success'); }
                                 })"
                                     class="mt-2 text-[10px] font-bold text-destructive hover:underline">Remove QR Code</button>
                                 @endif
@@ -170,7 +179,7 @@
                     </div>
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Bank Account Name</label>
-                        <input type="text" name="bank_account_name" value="{{ $settings['bank_account_name'] ?? '' }}" placeholder="Sto. Rosario Parish - Pacita 1"
+                        <input type="text" name="bank_account_name" value="{{ $settings['bank_account_name'] ?? '' }}" placeholder="Paroisse Saint-Joseph Artisan - Riviera Bonoumin"
                             class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
                         @error('bank_account_name') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -186,7 +195,7 @@
         </form>
 
         {{-- Leadership --}}
-        <form id="section-leadership" action="{{ route('admin.settings.section.update', 'leadership') }}" method="POST" enctype="multipart/form-data" x-data="settingsSection()" @submit="$root.revokePreviews()">
+        <form id="section-leadership" action="{{ route('admin.settings.section.update', 'leadership') }}" method="POST" enctype="multipart/form-data" x-data="settingsSection()">
             @csrf
             <x-admin-card>
                 <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Leadership Information</h3>
@@ -208,10 +217,10 @@
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Parish Priest Image</label>
                         <div class="flex items-center gap-6 p-4 bg-muted/10 rounded-xl border border-dashed">
                             <div class="h-32 w-32 shrink-0 rounded-full overflow-hidden border bg-white shadow-sm flex items-center justify-center">
-                                <template x-if="$root.priestPreview"><img :src="$root.priestPreview" class="h-full w-full object-cover" /></template>
-                                <template x-if="!$root.priestPreview"><span class="text-muted-foreground text-[10px] font-black">No Image</span></template>
+                                <template x-if="priestPreview"><img :src="priestPreview" class="h-full w-full object-cover" /></template>
+                                <template x-if="!priestPreview"><span class="text-muted-foreground text-[10px] font-black">No Image</span></template>
                             </div>
-                            <input type="file" name="priest_image" accept="image/*" @change="$root.handleFileUpload($event, 'priestPreview', 'Priest image')"
+                            <input type="file" name="priest_image" accept="image/*" @change="handleFileUpload($event, 'priestPreview', 'Priest image')"
                                 class="flex-1 text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white">
                         </div>
                     </div>
@@ -274,10 +283,10 @@
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Assistant Parish Priest Image</label>
                         <div class="flex items-center gap-6 p-4 bg-muted/10 rounded-xl border border-dashed">
                             <div class="h-32 w-32 shrink-0 rounded-full overflow-hidden border bg-white shadow-sm flex items-center justify-center">
-                                <template x-if="$root.assistantPriestPreview"><img :src="$root.assistantPriestPreview" class="h-full w-full object-cover" /></template>
-                                <template x-if="!$root.assistantPriestPreview"><span class="text-muted-foreground text-[10px] font-black">No Image</span></template>
+                                <template x-if="assistantPriestPreview"><img :src="assistantPriestPreview" class="h-full w-full object-cover" /></template>
+                                <template x-if="!assistantPriestPreview"><span class="text-muted-foreground text-[10px] font-black">No Image</span></template>
                             </div>
-                            <input type="file" name="assistant_priest_image" accept="image/*" @change="$root.handleFileUpload($event, 'assistantPriestPreview', 'Assistant priest image')"
+                            <input type="file" name="assistant_priest_image" accept="image/*" @change="handleFileUpload($event, 'assistantPriestPreview', 'Assistant priest image')"
                                 class="flex-1 text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white">
                         </div>
                     </div>
@@ -490,7 +499,7 @@
                     </div>
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Email Sign-off Name</label>
-                        <input type="text" name="email_signoff" value="{{ $settings['email_signoff'] ?? 'Sto. Rosario Parish' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm">
+                        <input type="text" name="email_signoff" value="{{ $settings['email_signoff'] ?? 'Paroisse Saint-Joseph Artisan' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm">
                     </div>
                 </div>
                 <x-settings-section-footer label="Save Email Templates" />

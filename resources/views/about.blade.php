@@ -1,11 +1,20 @@
 <x-public-layout>
     <x-slot name="meta">
-        <meta name="description" content="Learn about Sto. Rosario Parish in Pacita, San Pedro, Laguna. Discover our history, the Queen of the Most Holy Rosary, office hours, and contact details.">
+        <meta name="description" content="Learn about Paroisse Saint-Joseph Artisan in Riviera Bonoumin, Abidjan, Côte d'Ivoire. Discover our history, the Queen of the Most Holy Rosary, office hours, and contact details.">
     </x-slot>
 
     @php
         // Settings images must be publicly accessible (works for both local `public` disk and Supabase).
         $settingsDisk = config('filesystems.default') === 'local' ? 'public' : config('filesystems.default');
+        $settingsImageUrl = static function (?string $path) use ($settingsDisk): string {
+            if (! $path) {
+                return '';
+            }
+
+            return config('filesystems.default') === 'local'
+                ? '/storage/'.ltrim($path, '/')
+                : \Illuminate\Support\Facades\Storage::disk($settingsDisk)->url($path);
+        };
     @endphp
 
     {{-- ───────────── STYLES + ANIMATIONS ───────────── --}}
@@ -834,7 +843,7 @@
 
     {{-- ═══════════════ HERO ═══════════════ --}}
     <section class="about-hero">
-        <p class="hero-eyebrow">Pacita, San Pedro, Laguna</p>
+        <p class="hero-eyebrow">Riviera Bonoumin, Abidjan, Côte d'Ivoire</p>
         <h1 class="hero-title font-heading">About Our Parish</h1>
         <div class="hero-divider"></div>
         <p class="hero-sub">
@@ -846,7 +855,7 @@
     {{-- ═══════════════ STATS ═══════════════ --}}
     <section class="stats-bar">
         @php
-            $foundedYear = 1983;
+            $foundedYear = 2010;
             $yearsOfService = max(1, now('Asia/Manila')->year - $foundedYear);
         @endphp
         <div class="stat-cell">
@@ -868,23 +877,23 @@
         <div class="calling-section">
             <div class="calling-img-wrap" data-reveal="scale">
                 <img
-                    src="{{ isset($global_settings['hero_image']) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($global_settings['hero_image']) : asset('images/parish-logo.png') }}"
-                    alt="Sto. Rosario Parish Church"
+                    src="{{ asset('images/eglise-interieur.jpg') }}"
+                    alt="Intérieur de l’église paroissiale Saint-Joseph Artisan"
                 >
-                <div class="calling-badge">Est. 1983</div>
+                <div class="calling-badge">Depuis 2010</div>
             </div>
             <div data-reveal="right">
                 <p class="calling-eyebrow">Our Calling</p>
-                <h2 class="font-heading calling-title">Building a sanctuary<br>of faith &amp; service</h2>
+                    <h2 class="font-heading calling-title">Bâtir un sanctuaire<br>de foi, d'unité et de service</h2>
                 <div class="calling-rule"></div>
                 <p class="calling-body">
-                    Sto. Rosario Parish is home to the venerable image of the Queen of the Most Holy Rosary of Pacita — a European-inspired wooden sculpture enshrined at the retablo mayor of our church. Carved in Paete, Laguna in 1982, she is the titular patroness of Brgy. Pacita 1 and the beloved protectress of the faithful of San Pedro.
+                    La Paroisse Saint-Joseph Artisan de Riviera Bonoumin est un foyer spirituel vibrant ancré au cœur d'Abidjan. Née de l'élan des fidèles rassemblés dès 2006 sous un apatam, la communauté a été érigée canoniquement en 2010 sous le patronage de Saint-Joseph Artisan. Elle est guidée aujourd'hui par son curé, le Révérend Père Serge-Daniel Acaffou, et son vicaire, le Père Joseph Lobakre.
                 </p>
                 <p class="calling-body">
-                    In 2024, the image was declared an <strong style="color:var(--maroon)">Important Cultural Property</strong> of the City of San Pedro. In 2025, Our Lady was accorded the honorific title <strong style="color:var(--maroon)">"Queen of the City of San Pedro."</strong>
-                </p>
+    Ancrée dans le doyenné Père Michel Pango de l'Archidiocèse d'Abidjan, notre paroisse se distingue par son dynamisme pastoral à travers ses Communautés Ecclésiales de Base (CEB), ses mouvements d'action catholique, ses chorales et ses commissions engagées dans la vie spirituelle et sociale des fidèles.
+</p>
                 <p class="calling-body">
-                    We welcome you whether you are a longtime parishioner, a visitor, or someone returning to the faith. Join us for Mass, take part in parish ministries, and let Sto. Rosario Parish be a place where prayer becomes community and community becomes mission.
+                    Nous vous accueillons chaleureusement, que vous soyez un paroissien de longue date, un visiteur ou quelqu'un qui cherche à se rapprocher de la foi. Rejoignez-nous pour la messe, participez à nos activités et faites de la Paroisse Saint-Joseph Artisan un lieu où la prière devient communion et où la communauté devient mission.
                 </p>
             </div>
         </div>
@@ -893,8 +902,8 @@
     {{-- ═══════════════ THE SEVEN SACRAMENTS ═══════════════ --}}
     <section class="sacraments-section">
         <div class="text-center">
-            <p class="section-eyebrow" data-reveal>The Pillars of our Faith</p>
-            <h2 class="section-title" data-reveal style="font-size:3rem; font-style:italic;">The Seven Sacraments</h2>
+            <p class="section-eyebrow" data-reveal>Les Piliers de notre Foi</p>
+            <h2 class="section-title" data-reveal style="font-size:3rem; font-style:italic;">Les Sept Sacrements</h2>
             <div style="width:40px; height:1px; background:var(--gold); margin:20px auto 0;"></div>
         </div>
 
@@ -903,13 +912,13 @@
             $settingsDisk = config('filesystems.default') === 'local' ? 'public' : config('filesystems.default');
 
             $sacraments = [
-                ['name' => 'Baptism',      'desc' => 'The gate of the sacraments and necessary for salvation, by which we are freed from sin and reborn as children of God.', 'icon' => 'droplets', 'image_key' => 'sacrament_baptism_image', 'fallback' => 'assets/sacraments/baptism.svg', 'alt' => 'Baptism at Sto. Rosario Parish'],
-                ['name' => 'Confirmation', 'desc' => 'The perfection of Baptismal grace, strengthening us with the gifts of the Holy Spirit to be witnesses of Christ.', 'icon' => 'flame', 'image_key' => 'sacrament_confirmation_image', 'fallback' => 'assets/sacraments/confirmation.svg', 'alt' => 'Confirmation at Sto. Rosario Parish'],
-                ['name' => 'Eucharist',    'desc' => 'The source and summit of the Christian life, where we receive the real body and blood of our Lord Jesus Christ.', 'icon' => 'sun', 'image_key' => 'sacrament_eucharist_image', 'fallback' => 'assets/sacraments/eucharist.svg', 'alt' => 'Eucharistic celebration at Sto. Rosario Parish'],
-                ['name' => 'Penance',      'desc' => 'The sacrament of reconciliation through which we obtain God\'s mercy for sins committed against Him.', 'icon' => 'shield-check', 'image_key' => 'sacrament_penance_image', 'fallback' => 'assets/sacraments/penance.svg', 'alt' => 'Confession at Sto. Rosario Parish'],
-                ['name' => 'Anointing',    'desc' => 'A source of spiritual and physical healing for those whose health is seriously impaired by sickness or old age.', 'icon' => 'hand-heart', 'image_key' => 'sacrament_anointing_image', 'fallback' => 'assets/sacraments/anointing.svg', 'alt' => 'Anointing of the Sick at Sto. Rosario Parish'],
-                ['name' => 'Holy Orders',  'desc' => 'The sacrament through which the mission entrusted by Christ to his apostles continues to be exercised in the Church.', 'icon' => 'cross', 'image_key' => 'sacrament_holy_orders_image', 'fallback' => 'assets/sacraments/holy-orders.svg', 'alt' => 'Ordination at Sto. Rosario Parish'],
-                ['name' => 'Matrimony',    'desc' => 'A sacred covenant between a man and a woman, established as a partnership of the whole of life for their mutual good.', 'icon' => 'heart', 'image_key' => 'sacrament_matrimony_image', 'fallback' => 'assets/sacraments/matrimony.svg', 'alt' => 'Wedding at Sto. Rosario Parish'],
+                ['name' => 'Baptême',        'desc' => 'Porte des sacrements et nécessaire au salut, le baptême nous libère du péché et nous fait renaître comme enfants de Dieu.', 'icon' => 'droplets', 'image_key' => 'sacrament_baptism_image', 'fallback' => 'assets/sacraments/baptism.svg', 'alt' => 'Baptême à la Paroisse Saint-Joseph Artisan'],
+                ['name' => 'Confirmation',   'desc' => 'Perfection de la grâce baptismale, la confirmation nous fortifie par les dons de l\'Esprit Saint afin que nous soyons témoins du Christ.', 'icon' => 'flame', 'image_key' => 'sacrament_confirmation_image', 'fallback' => 'assets/sacraments/confirmation.svg', 'alt' => 'Confirmation à la Paroisse Saint-Joseph Artisan'],
+                ['name' => 'Eucharistie',    'desc' => 'Source et sommet de la vie chrétienne, l\'Eucharistie nous donne de recevoir réellement le corps et le sang de notre Seigneur Jésus-Christ.', 'icon' => 'sun', 'image_key' => 'sacrament_eucharist_image', 'fallback' => 'assets/sacraments/eucharist.svg', 'alt' => 'Célébration eucharistique à la Paroisse Saint-Joseph Artisan'],
+                ['name' => 'Réconciliation', 'desc' => 'Le sacrement de pénitence et de réconciliation nous permet de recevoir la miséricorde de Dieu pour les péchés commis contre Lui.', 'icon' => 'shield-check', 'image_key' => 'sacrament_penance_image', 'fallback' => 'assets/sacraments/penance.svg', 'alt' => 'Confession à la Paroisse Saint-Joseph Artisan'],
+                ['name' => 'Onction des malades', 'desc' => 'Source de guérison spirituelle et physique pour les personnes gravement affaiblies par la maladie ou la vieillesse.', 'icon' => 'hand-heart', 'image_key' => 'sacrament_anointing_image', 'fallback' => 'assets/sacraments/anointing.svg', 'alt' => 'Sacrement des malades à la Paroisse Saint-Joseph Artisan'],
+                ['name' => 'Ordre',          'desc' => 'Le sacrement par lequel la mission confiée par le Christ à ses apôtres continue d\'être exercée dans l\'Église.', 'icon' => 'cross', 'image_key' => 'sacrament_holy_orders_image', 'fallback' => 'assets/sacraments/holy-orders.svg', 'alt' => 'Ordination à la Paroisse Saint-Joseph Artisan'],
+                ['name' => 'Mariage',        'desc' => 'Alliance sacrée entre un homme et une femme, le mariage est un engagement de toute une vie pour leur bien commun.', 'icon' => 'heart', 'image_key' => 'sacrament_matrimony_image', 'fallback' => 'assets/sacraments/matrimony.svg', 'alt' => 'Mariage à la Paroisse Saint-Joseph Artisan'],
             ];
 
             $icons = [
@@ -927,7 +936,7 @@
             @php
                 $sacramentImage = $global_settings[$s['image_key']] ?? null;
                 $sacramentSrc = $sacramentImage
-                    ? \Illuminate\Support\Facades\Storage::disk($settingsDisk)->url($sacramentImage)
+                    ? $settingsImageUrl($sacramentImage)
                     : asset($s['fallback']);
             @endphp
             <div class="sacrament-card" data-reveal="up" style="transition-delay: {{ $loop->index * 0.1 }}s">
@@ -1035,37 +1044,40 @@
 
         <div class="patrons-layout">
             <div class="patron-content" data-reveal="left">
-                <h3>The Queen of the Most Holy Rosary</h3>
+                <h3>Saint Joseph Artisan</h3>
                 <div class="patron-rule"></div>
                 <p class="patron-description">
-                    Enshrined at the heart of our parish, Our Lady of the Most Holy Rosary of Pacita stands as the titular patroness and beloved protectress of our community. 
+                    Établi au cœur de notre paroisse à la Riviera Bonoumin, Saint Joseph Artisan se dresse comme le patron titulaire et le protecteur bien-aimé de notre communauté. 
                 </p>
                 <p class="patron-description" style="font-size:0.95rem; font-style:italic;">
-                    "Through her intercession, we find the strength to walk the path of faith, united as one family in the love of her Son, our Lord Jesus Christ."
+                    « Par son intercession, nous trouvons la force d'accomplir nos tâches quotidiennes avec amour, unis comme une seule famille dans la grâce de son Fils, notre Seigneur Jésus-Christ. »
                 </p>
                 <div style="margin-top:40px;">
-                    <span style="font-size:12px; font-weight:700; color:var(--gold); letter-spacing:0.1em; text-transform:uppercase;">Feast Day: October 16</span>
+                    <span style="font-size:12px; font-weight:700; color:var(--gold); letter-spacing:0.1em; text-transform:uppercase;">Fête patronale : 1er Mai</span>
                 </div>
             </div>
             <div class="patron-img-wrap" data-reveal="scale">
-                <img src="{{ asset('images/parish-logo.png') }}" alt="Our Lady of the Most Holy Rosary">
-                <div class="patron-badge">Titular Patroness</div>
+                <img src="{{ asset('images/saint-joseph-artisan.jpg') }}" alt="Statue de Saint Joseph Artisan tenant un lys et un outil">
+                <div class="patron-badge">Saint Patron Titulaire</div>
             </div>
         </div>
 
         <div class="patrons-layout" style="margin-top:100px;">
             <div class="patron-img-wrap" data-reveal="scale">
-                <img src="{{ asset('images/parish-logo.png') }}" alt="San Vicente Ferrer">
-                <div class="patron-badge">Segunda Patron</div>
+                <img src="{{ asset('images/Marie.jpg') }}" alt="La Sainte Vierge Marie">
+                <div class="patron-badge">Seconde Patronne</div>
             </div>
             <div class="patron-content" data-reveal="right">
-                <h3>San Vicente Ferrer</h3>
+                <h3>La Sainte Vierge Marie</h3>
                 <div class="patron-rule"></div>
                 <p class="patron-description">
-                    The legendary "Angel of the Judgment," San Vicente Ferrer serves as the Segunda Patron of our parish. A powerful preacher and miracle-worker, he inspires our community to live a life of repentance, service, and unwavering devotion to the Gospel.
+                    Modèle de foi et Mère de notre communauté, la Sainte Vierge Marie veille sur les fidèles de notre paroisse et de nos Communautés Ecclésiales de Base (CEB). Elle guide nos pas vers son Fils avec un amour maternel et une intercession constante.
+                </p>
+                <p class="patron-description" style="font-size:0.95rem; font-style:italic;">
+                    « Sous son manteau protecteur, notre communauté trouve la paix, l'unité et l'inspiration pour grandir dans la charité et le service. »
                 </p>
                 <div style="margin-top:40px;">
-                    <span style="font-size:12px; font-weight:700; color:var(--gold); letter-spacing:0.1em; text-transform:uppercase;">Feast Day: April 5</span>
+                    <span style="font-size:12px; font-weight:700; color:var(--gold); letter-spacing:0.1em; text-transform:uppercase;">Fête : 8 Décembre (Immaculée Conception)</span>
                 </div>
             </div>
         </div>
@@ -1074,11 +1086,11 @@
     {{-- ═══════════════ LEADERSHIP ═══════════════ --}}
     <section class="leadership-section">
         <p class="section-eyebrow" data-reveal>Our Leadership</p>
-        <h2 class="leadership-title" data-reveal>Shepherds of<br>the flock</h2>
+        <h2 class="leadership-title" data-reveal>Les prêtres de<br>the flock</h2>
         <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:32px; max-width:960px; margin:0 auto;">
             <div class="leader-card" data-reveal="scale">
                 @if(isset($global_settings['priest_image']))
-                    <div class="leader-avatar" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::disk($settingsDisk)->url($global_settings['priest_image']) }}'); background-size: cover; background-position: center;"></div>
+                    <div class="leader-avatar" style="background-image: url('{{ $settingsImageUrl($global_settings['priest_image']) }}'); background-size: cover; background-position: center;"></div>
                 @else
                     <div class="leader-avatar">FV</div>
                 @endif
@@ -1105,7 +1117,7 @@
             @if(!empty($global_settings['assistant_priest_name']))
             <div class="leader-card" data-reveal="scale">
                 @if(isset($global_settings['assistant_priest_image']))
-                    <div class="leader-avatar" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::disk($settingsDisk)->url($global_settings['assistant_priest_image']) }}'); background-size: cover; background-position: center;"></div>
+                    <div class="leader-avatar" style="background-image: url('{{ $settingsImageUrl($global_settings['assistant_priest_image']) }}'); background-size: cover; background-position: center;"></div>
                 @else
                     <div class="leader-avatar">AP</div>
                 @endif
@@ -1134,7 +1146,7 @@
                 @endphp
                 <div class="leader-card former-priest-card" data-reveal="scale">
                     @if(!empty($fp['image']))
-                        <div class="leader-avatar" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::disk($settingsDisk)->url($fp['image']) }}'); background-size: cover; background-position: center;"></div>
+                        <div class="leader-avatar" style="background-image: url('{{ $settingsImageUrl($fp['image']) }}'); background-size: cover; background-position: center;"></div>
                     @else
                         <div class="leader-avatar">{{ $initials ?: '?' }}</div>
                     @endif
@@ -1177,7 +1189,7 @@
                     </div>
                     <p class="info-card-label">Address</p>
                     @php
-                        $address = $global_settings['parish_address'] ?? '1 Sto. Rosario Drive, Pacita, San Pedro, Laguna';
+                        $address = $global_settings['parish_address'] ?? 'Paroisse St Joseph https://maps.app.goo.gl/ineJKGS5ux346zJR9';
                         $addressHtml = nl2br(e($address));
                     @endphp
                     <p>{!! $addressHtml !!}</p>
@@ -1196,13 +1208,13 @@
                         } elseif (is_array($contactRaw)) {
                             $contactNumbers = $contactRaw;
                         } else {
-                            $contactNumbers = ['(02) 8869 2742', '0906 099 2324'];
+                            $contactNumbers = ['2722496069'];
                         }
                     @endphp
                     @foreach($contactNumbers as $number)
                     <p>{{ $number }}</p>
                     @endforeach
-                    <small>{{ $global_settings['parish_email'] ?? config('services.parish.office_email', 'officestorosarioparish@gmail.com') }}</small>
+                    <small>{{ $global_settings['parish_email'] ?? config('services.parish.office_email', 'paroisse.stjoseph.bonoumin@gmail.com') }}</small>
                 </div>
 
                 <div class="info-card" data-reveal style="transition-delay:.2s">
@@ -1276,9 +1288,9 @@
         L.marker([lat, lng], { icon }).addTo(map)
             .bindPopup(`
                 <div style="font-family:sans-serif;padding:4px 2px;min-width:200px;">
-                    <p style="font-weight:700;font-size:14px;color:#0D2A52;margin:0 0 4px;">Sto. Rosario Parish</p>
+                    <p style="font-weight:700;font-size:14px;color:#0D2A52;margin:0 0 4px;">Paroisse Saint-Joseph Artisan</p>
                     <p style="font-size:12px;color:#777;margin:0 0 10px;line-height:1.5;">
-                        1 Sto. Rosario Drive,<br>Pacita, San Pedro, Laguna
+                        1 Saint-JosephDrive,<br>Riviera Bonoumin, Abidjan, Côte d'Ivoire
                     </p>
                     <a href="${directionsUrl}" target="_blank"
                        style="display:inline-block;background:#F5C518;color:#0D2A52;font-size:12px;font-weight:700;padding:6px 14px;border-radius:6px;text-decoration:none;">

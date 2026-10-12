@@ -26,7 +26,7 @@ class MassScheduleController extends Controller
         $schedule = MassSchedule::findOrFail($id);
 
         $title = $schedule->title ?: 'Mass Schedule';
-        $location = 'Sto. Rosario Parish, Pacita';
+        $location = 'Paroisse Saint-Joseph Artisan, Pacita';
 
         $ical = "BEGIN:VCALENDAR\r\n";
         $ical .= "VERSION:2.0\r\n";

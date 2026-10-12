@@ -1,8 +1,18 @@
 <x-public-layout>
+    @php
+        $isFrench = app()->getLocale() === 'fr';
+        $categoryLabels = $isFrench ? [
+            'Parish Life' => 'Vie paroissiale',
+            'Liturgical' => 'Liturgie',
+            'Sacraments' => 'Sacrements',
+            'Formation' => 'Formation',
+            'Recruitment' => 'Recrutement',
+        ] : [];
+    @endphp
     <x-slot name="meta">
-        <meta name="description" content="Stay updated with the latest announcements and parish news from Sto. Rosario Parish.">
-        <meta property="og:title" content="Parish Announcements | Sto. Rosario Parish">
-        <meta property="og:description" content="Latest news, novenas, community updates, and event announcements from Sto. Rosario Parish.">
+        <meta name="description" content="{{ $isFrench ? 'Suivez les dernières annonces et actualités de la paroisse Saint-Joseph Artisan.' : 'Stay updated with the latest announcements and parish news from Paroisse Saint-Joseph Artisan.' }}">
+        <meta property="og:title" content="{{ $isFrench ? 'Annonces paroissiales | Paroisse Saint-Joseph Artisan' : 'Parish Announcements | Paroisse Saint-Joseph Artisan' }}">
+        <meta property="og:description" content="{{ $isFrench ? 'Actualités, neuvaines, nouvelles de la communauté et événements de la paroisse Saint-Joseph Artisan.' : 'Latest news, novenas, community updates, and event announcements from Paroisse Saint-Joseph Artisan.' }}">
         <style>
             .eyebrow {
                 font-size: 10px; font-weight: 600;
@@ -67,20 +77,20 @@
             </div>
 
             <div class="divider-ornament mb-4 animate-fade-in delay-1">
-                <span class="eyebrow" style="color:rgba(245,197,24,0.70);">Stay Informed</span>
+                <span class="eyebrow" style="color:rgba(245,197,24,0.70);">{{ $isFrench ? 'Restez informés' : 'Stay Informed' }}</span>
             </div>
 
             <h1 class="font-heading animate-fade-up delay-1"
                 style="font-size:clamp(2.8rem,6vw,5.5rem); font-weight:700; font-style:italic;
                        color:#FFF; line-height:1.05; letter-spacing:-0.01em; margin-bottom:16px;
                        text-shadow:0 4px 32px rgba(0,0,0,0.45);">
-                Parish Announcements
+                {{ $isFrench ? 'Annonces paroissiales' : 'Parish Announcements' }}
             </h1>
 
             <p class="font-heading animate-fade-up delay-2"
                style="font-style:italic; color:rgba(245,197,24,0.75);
                       font-size:clamp(0.9rem,1.8vw,1.1rem); font-weight:300;">
-                Latest news, novenas, and community updates from Sto. Rosario Parish.
+                {{ $isFrench ? 'Actualités, neuvaines et nouvelles de la communauté de la paroisse Saint-Joseph Artisan.' : 'Latest news, novenas, and community updates from Paroisse Saint-Joseph Artisan.' }}
             </p>
         </div>
 
@@ -95,7 +105,7 @@
                 <button @click="switchTab('all')"
                     :class="activeTab === 'all' ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-primary/60'"
                     class="relative px-5 py-3 text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-colors duration-200 border-b-2 -mb-[2px]">
-                    All
+                    {{ $isFrench ? 'Toutes' : 'All' }}
                     <span class="ml-1.5 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black transition-colors duration-200"
                         :class="activeTab === 'all' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'">
                         <span x-text="counts['all']"></span>
@@ -105,7 +115,7 @@
                     <button @click="switchTab('{{ $cat }}')"
                         :class="activeTab === '{{ $cat }}' ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-primary/60'"
                         class="relative px-5 py-3 text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-colors duration-200 border-b-2 -mb-[2px]">
-                        {{ $cat }}
+                        {{ $categoryLabels[$cat] ?? $cat }}
                         <span class="ml-1.5 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black transition-colors duration-200"
                             :class="activeTab === '{{ $cat }}' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'">
                             <span x-text="counts['{{ $cat }}']"></span>
@@ -132,7 +142,7 @@
                                     <template x-if="ann.is_recruitment">
                                         <span class="inline-flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-accent">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                                            <span>Recruitment</span>
+                                            <span>{{ $isFrench ? 'Recrutement' : 'Recruitment' }}</span>
                                         </span>
                                     </template>
                                 </div>
@@ -149,15 +159,15 @@
                             <template x-if="ann.date_from">
                                 <div class="flex items-center gap-1.5 mb-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted-foreground"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                    <span class="text-[11px] font-bold text-primary" x-text="new Date(ann.date_from + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + (ann.date_to ? ' – ' + new Date(ann.date_to + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '')"></span>
+                                    <span class="text-[11px] font-bold text-primary" x-text="new Date(ann.date_from + 'T00:00:00').toLocaleDateString(document.documentElement.lang, { month: 'short', day: 'numeric' }) + (ann.date_to ? ' – ' + new Date(ann.date_to + 'T00:00:00').toLocaleDateString(document.documentElement.lang, { month: 'short', day: 'numeric' }) : '')"></span>
                                 </div>
                             </template>
                             <div class="mt-auto pt-4 border-t border-muted flex items-center justify-between">
                                 <a :href="ann.url" class="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-primary hover:text-accent transition-colors">
-                                    Read more <span aria-hidden="true">&rarr;</span>
+                                    {{ $isFrench ? 'Lire la suite' : 'Read more' }} <span aria-hidden="true">&rarr;</span>
                                 </a>
                                 <template x-if="ann.is_recruitment && ann.registration_link">
-                                    <a :href="ann.registration_link" target="_blank" rel="noopener" class="gold-btn text-[9.5px] px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider">Register Now</a>
+                                    <a :href="ann.registration_link" target="_blank" rel="noopener" class="gold-btn text-[9.5px] px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider">{{ $isFrench ? 'S’inscrire maintenant' : 'Register Now' }}</a>
                                 </template>
                             </div>
                         </div>
@@ -168,8 +178,8 @@
             {{-- Empty state --}}
             <div x-show="announcements.length === 0" class="text-center py-20 bg-muted/30 rounded-[3rem] border-2 border-dashed">
                 <div class="font-cinzel text-5xl mb-5 opacity-20 text-primary">✝</div>
-                <h3 class="font-heading font-bold italic text-2xl mb-2 text-primary">No Announcements</h3>
-                <p class="text-muted-foreground italic">There are currently no announcements in this category. Please check back soon.</p>
+                <h3 class="font-heading font-bold italic text-2xl mb-2 text-primary">{{ $isFrench ? 'Aucune annonce' : 'No Announcements' }}</h3>
+                <p class="text-muted-foreground italic">{{ $isFrench ? 'Aucune annonce dans cette catégorie pour le moment. Revenez bientôt.' : 'There are currently no announcements in this category. Please check back soon.' }}</p>
             </div>
         </div>
     </section>

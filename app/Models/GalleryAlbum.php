@@ -27,11 +27,11 @@ class GalleryAlbum extends Model
 
     public function images()
     {
-        return $this->hasMany(GalleryImage::class, 'album_id');
+        return $this->hasMany(GalleryImage::class, 'album_id')->where('is_published', true);
     }
 
     public function coverImage()
     {
-        return $this->hasOne(GalleryImage::class, 'album_id')->orderByDesc('created_at');
+        return $this->hasOne(GalleryImage::class, 'album_id')->where('is_published', true)->orderByDesc('created_at');
     }
 }

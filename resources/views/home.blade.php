@@ -1,6 +1,9 @@
 <x-public-layout>
+@php
+    $isFrench = app()->getLocale() === 'fr';
+@endphp
 <x-slot name="meta">
-    <meta name="description" content="Welcome to Sto. Rosario Parish – Pacita, San Pedro, Laguna. Mass schedules, intentions, events, and community news.">
+    <meta name="description" content="Welcome to Paroisse Saint-Joseph Artisan – Riviera Bonoumin, Abidjan, Côte d'Ivoire. Mass schedules, intentions, events, and community news.">
     <link rel="preload" href="{{ asset('fonts/Canterbury.ttf') }}" as="font" type="font/ttf" crossorigin>
     <style>
         @font-face{font-family:'Canterbury';src:url('{{ asset('fonts/Canterbury.ttf') }}') format('truetype');font-weight:normal;font-style:normal;font-display:swap;}
@@ -9,7 +12,7 @@
 
 <section class="hero-section" style="position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
     <div style="position:absolute;inset:0;z-index:0;">
-        <img src="{{ asset('images/parish-logo.png') }}" alt="Sto. Rosario Parish" fetchpriority="high" decoding="async" width="1920" height="1080" style="width:100%;height:100%;object-fit:cover;filter:saturate(.75) brightness(.85);transform:scale(1.04);">
+        <img src="{{ asset('images/parish-logo.png') }}" alt="Paroisse Saint-Joseph Artisan" fetchpriority="high" decoding="async" width="1920" height="1080" style="width:100%;height:100%;object-fit:cover;filter:saturate(.75) brightness(.85);transform:scale(1.04);">
         <div class="hero-overlay" style="position:absolute;inset:0;"></div>
     </div>
     <div style="position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(26,64,128,.22) 0%,transparent 70%);"></div>
@@ -18,14 +21,14 @@
     <div style="position:relative;z-index:10;text-align:center;display:flex;flex-direction:column;align-items:center;padding:80px 24px 0;width:100%;max-width:960px;">
         <div class="hero-badge animate-fade-in-down" style="margin-bottom:24px;animation-delay:.1s;">
             <span style="width:6px;height:6px;border-radius:50%;background:var(--gold);display:block;box-shadow:0 0 8px rgba(245,197,24,.8);"></span>
-            <span style="font-size:11.5px;font-weight:600;letter-spacing:.38em;text-transform:uppercase;color:rgba(255,248,180,.85);">Est. · Diocese of San Pablo · Pacita</span>
+            <span style="font-size:11.5px;font-weight:600;letter-spacing:.38em;text-transform:uppercase;color:rgba(255,248,180,.85);">Diocèse d'Abidjan</span>
         </div>
 
-        <h1 class="animate-fade-in-up" style="font-family:'Canterbury',serif;font-weight:400;line-height:1.1;letter-spacing:.01em;margin-bottom:20px;text-shadow:0 4px 48px rgba(0,0,0,.55);font-size:clamp(2.2rem,8vw,5.5rem);color:#fff;animation-delay:.2s;">
-            <span class="hero-title-accent">Sto. Rosario Parish</span>
+        <h1 class="animate-fade-in-up" style="font-family:var(--font-body);font-weight:400;line-height:1.1;letter-spacing:.01em;margin-bottom:20px;text-shadow:0 4px 48px rgba(0,0,0,.55);font-size:clamp(2.2rem,8vw,5.5rem);color:#fff;animation-delay:.2s;">
+            <span class="hero-title-accent">Paroisse Saint-Joseph Artisan</span>
         </h1>
 
-        <p class="font-heading animate-fade-in-up" style="font-style:italic;color:rgba(255,215,64,.82);margin-bottom:14px;font-size:clamp(.9rem,1.8vw,1.15rem);font-weight:300;text-shadow:0 2px 12px rgba(0,0,0,.4);animation-delay:.3s;">Pacita Complex 1, San Pedro, Laguna</p>
+        <p class="font-heading animate-fade-in-up" style="font-style:italic;color:rgba(255,215,64,.82);margin-bottom:14px;font-size:clamp(.9rem,1.8vw,1.15rem);font-weight:300;text-shadow:0 2px 12px rgba(0,0,0,.4);animation-delay:.3s;">Riviera Bonoumin Cocody, Abidjan, Côte d'Ivoire</p>
         <div style="width:56px;height:1px;margin-bottom:22px;background:linear-gradient(90deg,transparent,rgba(245,197,24,.65),transparent);"></div>
         <p class="animate-fade-in-up" style="color:rgba(220,232,255,.78);font-size:clamp(.85rem,1.4vw,1rem);line-height:1.78;max-width:430px;font-weight:300;letter-spacing:.01em;margin-bottom:36px;animation-delay:.4s;">Home to the Queen of the Most Holy Rosary — a beacon of faith, community, and service for over four decades.</p>
 
@@ -46,7 +49,7 @@
 
         <div class="hero-stats-strip animate-fade-in-up" style="display:flex;align-items:center;justify-content:center;gap:60px;padding:20px 32px;width:100%;max-width:440px;border-top:1px solid rgba(245,197,24,.15);border-radius:16px;background:rgba(255,255,255,0.04);backdrop-filter:blur(6px);animation-delay:.6s;">
             @php
-            $foundedYear = 1983;
+            $foundedYear = 2010;
             $yearsOfService = max(1, now('Asia/Manila')->year - $foundedYear);
         @endphp
         @foreach([[$yearsOfService.'+','Years of Service'],['13','Weekly Masses']] as $stat)
@@ -107,10 +110,10 @@
                     <span class="font-cinzel relative z-10" style="color:#C9A200;font-size:1.35rem;line-height:1;" aria-hidden="true">✝</span>
                 </div>
             </div>
-            <div class="eyebrow mb-3">UPCOMING EVENTS</div>
-            <h2 class="font-heading font-bold italic" style="font-size:clamp(2.4rem,5vw,4rem);color:var(--blue-deep);line-height:1.1;margin-bottom:12px;">What's Happening</h2>
+            <div class="eyebrow mb-3">{{ $isFrench ? 'ÉVÉNEMENTS À VENIR' : 'UPCOMING EVENTS' }}</div>
+            <h2 class="font-heading font-bold italic" style="font-size:clamp(2.4rem,5vw,4rem);color:var(--blue-deep);line-height:1.1;margin-bottom:12px;">{{ $isFrench ? 'Nos prochains rendez-vous' : "What's Happening" }}</h2>
             <div class="flex justify-center mb-4"><div style="width:7px;height:7px;background:rgba(201,162,0,.42);transform:rotate(45deg);"></div></div>
-            <p style="color:rgba(13,42,82,.45);font-size:16px;max-width:480px;margin:0 auto;line-height:1.7;">Stay connected. Join us in our liturgical celebrations and events.</p>
+            <p style="color:rgba(13,42,82,.45);font-size:16px;max-width:480px;margin:0 auto;line-height:1.7;">{{ $isFrench ? 'Restez en lien avec la paroisse et participez à nos célébrations liturgiques et à nos événements.' : 'Stay connected. Join us in our liturgical celebrations and events.' }}</p>
         </div>
 
         <div class="events-grid grid md:grid-cols-3 gap-8 mb-8 reveal reveal-stagger">
@@ -118,13 +121,13 @@
             <div class="card-event card-event-featured relative">
                 <div class="event-badge-today">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    <span style="font-size:11px;font-weight:700;letter-spacing:.18em;color:#C9A200;text-transform:uppercase;">{{ strtoupper($nextMass->calculated_day) }}</span>
+                    <span style="font-size:11px;font-weight:700;letter-spacing:.18em;color:#C9A200;text-transform:uppercase;">{{ $nextMass->calculated_day }}</span>
                 </div><br>
                 <div class="flex flex-col items-center text-center pt-14 pb-5 px-6" style="flex:1;">
                     <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4" style="background:rgba(245,197,24,.07);border:1.5px solid rgba(201,162,0,.28);">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 22h8"/><path d="M12 11v11"/><path d="M5 3h14L18 9a6 6 0 0 1-12 0L5 3z"/><path d="M3 3h18"/></svg>
                     </div>
-                    <p style="font-size:12px;letter-spacing:.22em;color:rgba(13,42,82,.5);text-transform:uppercase;font-weight:600;margin-bottom:10px;">{{ strtoupper($nextMass->title ?? ($nextMass->mass_type === 'sunday' ? 'Sunday Mass' : 'Weekday Mass')) }}</p>
+                    <p style="font-size:12px;letter-spacing:.22em;color:rgba(13,42,82,.5);text-transform:uppercase;font-weight:600;margin-bottom:10px;">{{ mb_strtoupper($nextMass->title ?? ($nextMass->mass_type === 'sunday' ? ($isFrench ? 'Messe du dimanche' : 'Sunday Mass') : ($isFrench ? 'Messe en semaine' : 'Weekday Mass')), 'UTF-8') }}</p>
                     <div class="flex justify-center mb-3"><div style="width:5px;height:5px;background:rgba(201,162,0,.45);transform:rotate(45deg);"></div></div>
                     <p class="font-heading font-bold" style="font-size:clamp(1.8rem,3vw,2.5rem);color:var(--blue-deep);line-height:1.05;">{{ $nextMass->calculated_time }}</p>
                 </div>
@@ -143,25 +146,35 @@
                 <div class="flex flex-col items-center text-center pt-5 pb-5 px-6" style="flex:1;">
                     <div class="flex items-center gap-1.5 mb-4" style="align-self:flex-start;">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(13,42,82,.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                        <span style="font-size:12px;letter-spacing:.14em;color:rgba(13,42,82,.4);text-transform:uppercase;font-weight:500;">{{ $evt->event_date->format('M d, Y') }}</span>
+                        <span style="font-size:12px;letter-spacing:.14em;color:rgba(13,42,82,.4);text-transform:uppercase;font-weight:500;">{{ \Carbon\Carbon::parse($evt->home_occurrence_date)->locale(app()->getLocale())->isoFormat('LL') }}</span>
                     </div>
                     <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4" style="background:rgba(245,197,24,.07);border:1.5px solid rgba(201,162,0,.28);">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $evtIcons[$loop->index % 2] !!}</svg>
                     </div>
-                    <p style="font-size:12px;letter-spacing:.22em;color:rgba(13,42,82,.5);text-transform:uppercase;font-weight:600;margin-bottom:10px;">{{ strtoupper($evt->title) }}</p>
+                    <p style="font-size:12px;letter-spacing:.22em;color:rgba(13,42,82,.5);text-transform:uppercase;font-weight:600;margin-bottom:10px;">{{ mb_strtoupper($evt->title, 'UTF-8') }}</p>
                     <div class="flex justify-center mb-3"><div style="width:5px;height:5px;background:rgba(201,162,0,.45);transform:rotate(45deg);"></div></div>
                     <p style="font-size:15px;color:var(--blue-deep);line-height:1.8;">
                         @php
                             $times = is_array($evt->event_time) ? $evt->event_time : [$evt->event_time];
-                            $formattedTimes = array_map(function($t) {
+                            $formattedTimes = array_map(function($t) use ($isFrench) {
                                 if (is_array($t)) {
                                     $timeStr = '';
-                                    if (!empty($t['date'])) $timeStr .= $t['date'] . ' ';
-                                    $timeStr .= $t['time'] ?? '';
+                                    if (!empty($t['date'])) $timeStr .= \Carbon\Carbon::parse($t['date'])->locale(app()->getLocale())->isoFormat('ll') . ' ';
+                                    if (!empty($t['time'])) {
+                                        try {
+                                            $timeStr .= \Carbon\Carbon::parse($t['time'], 'Asia/Manila')->locale(app()->getLocale())->isoFormat($isFrench ? 'HH:mm' : 'h:mm A');
+                                        } catch (\Throwable $exception) {
+                                            $timeStr .= $t['time'];
+                                        }
+                                    }
                                     if (!empty($t['title'])) $timeStr .= " ({$t['title']})";
                                     return trim($timeStr);
                                 }
-                                return (string) $t;
+                                try {
+                                    return \Carbon\Carbon::parse((string) $t, 'Asia/Manila')->locale(app()->getLocale())->isoFormat($isFrench ? 'HH:mm' : 'h:mm A');
+                                } catch (\Throwable $exception) {
+                                    return (string) $t;
+                                }
                             }, $times);
                         @endphp
                         @if(!empty($formattedTimes))
@@ -179,26 +192,35 @@
                     <div class="w-14 h-14 rounded-full flex items-center justify-center mb-4" style="background:rgba(26,64,128,.04);border:1px solid rgba(26,64,128,.08);">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(13,42,82,.25)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                     </div>
-                    <p style="font-size:11px;color:rgba(13,42,82,.3);">No upcoming event</p>
+                    <p style="font-size:11px;color:rgba(13,42,82,.3);">{{ $isFrench ? 'Aucun événement à venir' : 'No upcoming event' }}</p>
                 </div>
             </div>
             @endfor
         </div>
 
-        <a href="{{ route('events') }}" class="group relative flex flex-col items-center justify-center overflow-hidden rounded-2xl events-cta-banner" style="background:#0A2342;text-decoration:none;padding:24px;min-height:100px;transition:all .35s ease;" aria-label="View full events schedule">
+        <a href="{{ route('events') }}" class="group relative flex flex-col items-center justify-center overflow-hidden rounded-2xl events-cta-banner" style="background:#0A2342;text-decoration:none;padding:24px;min-height:100px;transition:all .35s ease;" aria-label="{{ $isFrench ? 'Voir le calendrier complet des événements' : 'View full events schedule' }}">
             <div class="absolute left-0 top-[70%] -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-110" style="opacity:.5;height:150%;width:auto;" aria-hidden="true">
                 <img src="{{ asset('images/parish-logo.png') }}" alt="Parish Illustration" width="285" height="135" style="height:90%;width:auto;object-fit:contain;filter:brightness(0) invert(1);">
             </div>
             <div class="relative z-10 flex flex-col items-center gap-2">
                 <div class="flex items-center gap-3">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    <span class="font-cinzel" style="font-size:13px;letter-spacing:.35em;color:#fff;font-weight:700;text-transform:uppercase;">View Full Schedule</span>
+                    <span class="font-cinzel" style="font-size:13px;letter-spacing:.35em;color:#fff;font-weight:700;text-transform:uppercase;">{{ $isFrench ? 'Voir tout le programme' : 'View Full Schedule' }}</span>
                 </div>
                 <span class="transition-all duration-300 group-hover:translate-x-2" style="color:#C9A200;font-size:18px;line-height:1;" aria-hidden="true">→</span>
             </div>
         </a>
     </div><br><br>
 </section>
+
+@if($nextHomeRefreshAt)
+<script>
+    (() => {
+        const delay = {{ $nextHomeRefreshAt * 1000 }} - Date.now();
+        if (delay > 0) window.setTimeout(() => window.location.reload(), Math.min(delay, 2147483647));
+    })();
+</script>
+@endif
 
 @if($announcements->isNotEmpty())
     @php
@@ -441,7 +463,7 @@
         <div class="max-w-2xl mx-auto text-center">
             <div class="font-cinzel text-4xl mb-8 opacity-60" style="color:var(--gold);">✝</div>
             <div class="divider-ornament mb-6"><span class="eyebrow">Unite Your Prayers</span></div>
-            <h2 class="font-heading text-4xl md:text-6xl font-bold italic leading-[1.05] mb-6" style="color:var(--blue-deep);">Offer a Mass<br>Intention</h2>
+            <h2 class="font-heading text-4xl md:text-6xl font-bold italic leading-[1.05] mb-6" style="color:var(--blue-deep);">Demander une Intention de <br>Messe</h2>
             <p class="text-lg leading-relaxed mb-12 font-light" style="color:rgba(13,42,82,.55);">Unite your prayers with the Holy Sacrifice of the Mass. Submit your intention online and our staff will include it in the upcoming liturgy.</p>
 
             <div class="intention-btns flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -455,7 +477,7 @@
                 </a>
             </div>
 
-            <p class="mt-16 text-[10px] font-medium uppercase tracking-[0.4em]" style="color:rgba(13,42,82,.25);">Sto. Rosario Parish · Pacita, San Pedro, Laguna</p>
+            <p class="mt-16 text-[10px] font-medium uppercase tracking-[0.4em]" style="color:rgba(13,42,82,.25);">Paroisse Saint-Joseph Artisan · Riviera Bonoumin, Abidjan, Côte d'Ivoire</p>
         </div>
     </div>
 </section>

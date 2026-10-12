@@ -140,7 +140,7 @@
         {{-- Page Header --}}
         <div class="mb-10">
             <div class="flex items-center gap-2 mb-1">
-                <p class="text-[10px] font-black uppercase tracking-[.2em] text-primary/30">Sto. Rosario Parish</p>
+                <p class="text-[10px] font-black uppercase tracking-[.2em] text-primary/30">Paroisse Saint-Joseph Artisan</p>
             </div>
             <h1 class="font-heading text-3xl font-bold text-primary italic">Dashboard</h1>
             <p class="text-sm text-muted-foreground mt-1">Overview of parish activities and statistics.</p>

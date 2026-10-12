@@ -17,32 +17,36 @@
                 h-[72px] flex items-center justify-between gap-2 pt-2">
 
 {{-- Logo (exact navy via mask; needs silhouette-friendly PNG) --}}
-<a href="{{ route('home') }}" class="flex items-start gap-2.5 group flex-shrink-0 pt-1">
+<a href="{{ route('home') }}" class="flex min-w-0 items-start gap-2.5 group flex-shrink-0 pt-1">
     <div class="relative w-8 h-8 flex items-center justify-center flex-shrink-0">
         <span
             class="w-8 h-8 transition-all duration-300"
             :style="scrolled
               ? `background:var(--color-primary);-webkit-mask:url('/images/parish-logo.png') center/contain no-repeat;mask:url('/images/parish-logo.png') center/contain no-repeat;`
               : `background:#fff;-webkit-mask:url('/images/parish-logo.png') center/contain no-repeat;mask:url('/images/parish-logo.png') center/contain no-repeat;`"
-            aria-label="Sto. Rosario Parish Logo"
+            aria-label="Paroisse Saint-Joseph Artisan Logo"
             role="img"
         ></span>
     </div>
-    <div>
-        <div class="text-[15px] font-bold tracking-[0.1em] leading-none transition-colors duration-300"
+    <div class="min-w-0">
+        <div class="hidden min-[400px]:block text-[15px] font-bold tracking-[0.1em] leading-none transition-colors duration-300"
             :style="`font-family:var(--font-heading); font-style:italic; color:${scrolled ? 'var(--color-primary)' : '#fff'};`">
-            Sto. Rosario Parish
+            Paroisse Saint-Joseph Artisan
+        </div>
+        <div class="min-[400px]:hidden text-xs font-bold tracking-[0.03em] leading-tight transition-colors duration-300"
+            :style="`font-family:var(--font-heading); font-style:italic; color:${scrolled ? 'var(--color-primary)' : '#fff'};`">
+            Saint-Joseph
         </div>
 
-        <div class="text-[9.5px] tracking-[0.3em] font-medium uppercase mt-0.5 transition-colors duration-300"
+        <div class="hidden sm:block text-[9.5px] tracking-[0.3em] font-medium uppercase mt-0.5 transition-colors duration-300"
             :style="`color:${scrolled ? 'rgba(13,42,82,0.6)' : 'rgba(255,255,255,0.6)'};`">
-            Pacita 1
+            Riviera Bonoumin
         </div>
     </div>
 </a>
 
         {{-- Desktop links --}}
-        <div class="hidden md:flex items-center gap-1 self-center">
+        <div class="hidden min-[1100px]:flex items-center gap-1 self-center">
 
             {{-- Parish Services --}}
             <div class="relative"
@@ -143,6 +147,7 @@
                             ['Parish Events',   '/events',  'Liturgical & community events'],
                             ['Gallery',         '/gallery', 'Memories & celebrations'],
                             ['About Our Parish','/about',   'History & our mission'],
+                            ['Bulletins',       route('bulletins.index'), 'Read parish bulletins'],
                         ] as [$label,$url,$sub])
                         <a href="{{ $url }}" role="menuitem" tabindex="-1"
                            @keydown.arrow-down.prevent="focusNext($event)"
@@ -184,7 +189,18 @@
         </div>
 
         {{-- Hamburger --}}
-        <button class="md:hidden w-10 h-10 flex items-center justify-center
+        <div class="hidden min-[1100px]:flex items-center gap-1 rounded-full border border-white/20 bg-black/20 px-1 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md shadow-lg">
+            <a href="{{ route('locale.switch', 'fr') }}" class="rounded-full px-2.5 py-1 {{ app()->getLocale() === 'fr' ? 'bg-white text-[#0D2A52]' : 'text-white/80 hover:bg-white/10' }}">FR</a>
+            <a href="{{ route('locale.switch', 'en') }}" class="rounded-full px-2.5 py-1 {{ app()->getLocale() === 'en' ? 'bg-white text-[#0D2A52]' : 'text-white/80 hover:bg-white/10' }}">EN</a>
+        </div>
+
+        <div class="ml-auto flex min-[1100px]:hidden shrink-0 items-center gap-2">
+        <div class="flex items-center gap-1 rounded-full border border-white/20 bg-black/20 px-1 py-1 text-[10px] max-sm:text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur-md shadow-lg">
+            <a href="{{ route('locale.switch', 'fr') }}" class="rounded-full px-2.5 py-1 {{ app()->getLocale() === 'fr' ? 'bg-white text-[#0D2A52]' : 'text-white/80 hover:bg-white/10' }}">FR</a>
+            <a href="{{ route('locale.switch', 'en') }}" class="rounded-full px-2.5 py-1 {{ app()->getLocale() === 'en' ? 'bg-white text-[#0D2A52]' : 'text-white/80 hover:bg-white/10' }}">EN</a>
+        </div>
+
+        <button class="w-10 h-10 flex items-center justify-center
                        rounded-full transition-all duration-200 flex-shrink-0 self-center"
                 :class="scrolled ? 'text-primary hover:bg-primary/5' : 'text-white hover:bg-white/10'"
                 @click="open = !open"
@@ -203,6 +219,7 @@
                 <path d="M18 6 6 18M6 6l12 12"/>
             </svg>
         </button>
+        </div>
     </div>
 
     {{-- MOBILE FULL-SCREEN DRAWER --}}
@@ -213,7 +230,7 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 translate-y-0"
 x-transition:leave-end="opacity-0 -translate-y-3"
-          class="md:hidden fixed inset-0 z-40 flex flex-col overflow-y-auto"
+          class="min-[1100px]:hidden fixed inset-0 z-40 flex flex-col overflow-y-auto"
           style="top:0; padding-top:88px; background:rgba(6,16,38,0.98); backdrop-filter:blur(24px);
                  -webkit-backdrop-filter:blur(24px);">
 
@@ -313,6 +330,12 @@ x-transition:leave-end="opacity-0 -translate-y-3"
                     'sub'   => 'History & our mission',
                     'icon'  => '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
                 ],
+                [
+                    'label' => 'Bulletins',
+                    'url'   => route('bulletins.index'),
+                    'sub'   => 'Read parish bulletins',
+                    'icon'  => '<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6M8 13h8M8 17h8"/>',
+                ],
             ] as $item)
             <a href="{{ $item['url'] }}"
                @click="open = false"
@@ -393,10 +416,6 @@ x-transition:leave-end="opacity-0 -translate-y-3"
             </a>
         </div>
     </div>
-    <div class="fixed top-5 right-4 z-[10000] flex items-center gap-1 rounded-full border border-white/20 bg-black/20 px-1 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md shadow-lg">
-        <a href="{{ route('locale.switch', 'fr') }}" class="rounded-full px-2.5 py-1 {{ app()->getLocale() === 'fr' ? 'bg-white text-[#0D2A52]' : 'text-white/80 hover:bg-white/10' }}">FR</a>
-        <a href="{{ route('locale.switch', 'en') }}" class="rounded-full px-2.5 py-1 {{ app()->getLocale() === 'en' ? 'bg-white text-[#0D2A52]' : 'text-white/80 hover:bg-white/10' }}">EN</a>
-    </div>
 </nav>
 
 <script>
@@ -413,7 +432,7 @@ document.addEventListener('alpine:init', () => {
                 this.scrolled = window.scrollY > 80 || !hasDarkHero
             }, { passive: true })
             window.addEventListener('resize', () => {
-                if (window.innerWidth >= 768) this.open = false
+                if (window.innerWidth >= 1100) this.open = false
             }, { passive: true })
         },
         closeAll() {

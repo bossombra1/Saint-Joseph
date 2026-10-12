@@ -1,6 +1,6 @@
 <x-public-layout>
 <x-slot name="meta">
-    <meta name="description" content="Submit a Mass Intention at Sto. Rosario Parish – Pacita, San Pedro, Laguna.">
+    <meta name="description" content="Submit a Mass Intention at Paroisse Saint-Joseph Artisan – Riviera Bonoumin, Abidjan, Côte d'Ivoire.">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
@@ -241,7 +241,7 @@
         <p class="font-heading animate-fade-up delay-2"
            style="font-style:italic; color:rgba(245,197,24,0.75);
                   font-size:clamp(0.9rem,1.8vw,1.1rem); font-weight:300;">
-            Pacita Complex 1, San Pedro, Laguna
+            Riviera Bonoumin Cocody, Abidjan, Côte d'Ivoire
         </p>
     </div>
 
@@ -564,7 +564,7 @@
                                 <div class="pay-info-box">
                                     <p class="eyebrow mb-3" style="color:rgba(13,42,82,0.40);">Bank Details</p>
                                     <p style="font-size:13px; color:var(--blue-deep); font-weight:600; line-height:1.8;">
-                                        {{ $global_settings['bank_details'] ?? 'Sto. Rosario Parish' }}
+                                        {{ $global_settings['bank_details'] ?? 'Paroisse Saint-Joseph Artisan' }}
                                     </p>
                                 </div>
                             </template>

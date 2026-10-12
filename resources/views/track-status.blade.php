@@ -288,7 +288,7 @@
     <p class="font-cinzel"
        style="text-align:center; margin-top:3.5rem; font-size:9px; letter-spacing:0.4em;
               text-transform:uppercase; color:rgba(13,42,82,0.18);">
-        Sto. Rosario Parish · Pacita, San Pedro, Laguna
+        Paroisse Saint-Joseph Artisan · Riviera Bonoumin, Abidjan, Côte d'Ivoire
     </p>
 </div>
 

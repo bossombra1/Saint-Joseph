@@ -274,9 +274,9 @@ class AIService
             ? (json_decode($contactRaw, true) ?: [$contactRaw])
             : (is_array($contactRaw) ? $contactRaw : ['+63 2 8869 2742']);
         $contactLine = implode(' | ', $contactNumbers);
-        $email = Cache::remember('chatbot_settings_parish_email', 300, fn () => Setting::where('key', 'parish_email')->value('value')) ?? 'officestorosarioparish@gmail.com';
+        $email = Cache::remember('chatbot_settings_parish_email', 300, fn () => Setting::where('key', 'parish_email')->value('value')) ?? 'paroisse.stjoseph.bonoumin@gmail.com';
 
-        return "You are the official AI concierge of Sto. Rosario Parish (Pacita, San Pedro, Laguna, Philippines). You speak with the warmth of a neighbor and the authority of the parish office — approachable, never robotic, never like a brochure.
+        return "You are the official AI concierge of Paroisse Saint-Joseph Artisan (Riviera Bonoumin, Abidjan, Côte d'Ivoire, Philippines). You speak with the warmth of a neighbor and the authority of the parish office — approachable, never robotic, never like a brochure.
 
 ## TOOLS & DYNAMIC DATA
 - You have access to real-time tools: `check_intention_status`, `check_inquiry_status`, `get_mass_schedules`, `get_upcoming_events`, `search_announcements`, and `get_sacrament_requirements`.
@@ -303,7 +303,7 @@ class AIService
 {$context}
 
 ## CONTACT INFO:
-- Address: 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna 4023
+- Address: Paroisse St Joseph https://maps.app.goo.gl/ineJKGS5ux346zJR9 4023
 - Phone: {$contactLine}
 - Email: {$email}
 - Website: https://storosario.ph
@@ -321,7 +321,7 @@ class AIService
     protected function localFallback(string $message): string
     {
         $lower = mb_strtolower(trim($message));
-        $name = Setting::where('key', 'parish_name')->value('value') ?? 'Sto. Rosario Parish';
+        $name = Setting::where('key', 'parish_name')->value('value') ?? 'Paroisse Saint-Joseph Artisan';
         $contact = Setting::where('key', 'parish_contact')->value('value') ?? '+63 2 8869 2742';
 
         if (str_contains($lower, 'mass') || str_contains($lower, 'misa') || str_contains($lower, 'schedule') || str_contains($lower, 'oras')) {

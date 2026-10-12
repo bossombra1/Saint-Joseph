@@ -1,6 +1,6 @@
 <x-public-layout>
 <x-slot name="meta">
-    <meta name="description" content="Terms & Conditions for the Sto. Rosario Parish – Pacita, San Pedro, Laguna website.">
+    <meta name="description" content="Terms & Conditions for the Paroisse Saint-Joseph Artisan – Riviera Bonoumin, Abidjan, Côte d'Ivoire website.">
 </x-slot>
 
 <section class="py-24 bg-[var(--cream)] section-pad-mobile section-pad-tablet">
@@ -18,7 +18,7 @@
 
             <h2 style="font-family:var(--font-heading,serif);font-weight:700;color:var(--blue-deep);font-size:1.3rem;margin-top:32px;margin-bottom:12px;">1. Use of the Website</h2>
             <p style="color:var(--blue-deep);line-height:1.8;margin-bottom:12px;">
-                The Sto. Rosario Parish website is provided to share information about the parish community, its Mass schedules, sacraments, events, and services. You agree to use this website only for lawful, non-commercial, community purposes and not in any way that could damage, disable, or impair the site.
+                The Paroisse Saint-Joseph Artisan website is provided to share information about the parish community, its Mass schedules, sacraments, events, and services. You agree to use this website only for lawful, non-commercial, community purposes and not in any way that could damage, disable, or impair the site.
             </p>
 
             <h2 style="font-family:var(--font-heading,serif);font-weight:700;color:var(--blue-deep);font-size:1.3rem;margin-top:32px;margin-bottom:12px;">2. Submissions (Intentions &amp; Inquiries)</h2>
@@ -38,7 +38,7 @@
 
             <h2 style="font-family:var(--font-heading,serif);font-weight:700;color:var(--blue-deep);font-size:1.3rem;margin-top:32px;margin-bottom:12px;">5. Intellectual Property</h2>
             <p style="color:var(--blue-deep);line-height:1.8;margin-bottom:20px;">
-                All content on this website — including text, images, graphics, logos, and media — belongs to Sto. Rosario Parish or its licensors. You may not copy, reproduce, or redistribute website content for commercial purposes without prior written permission.
+                All content on this website — including text, images, graphics, logos, and media — belongs to Paroisse Saint-Joseph Artisan or its licensors. You may not copy, reproduce, or redistribute website content for commercial purposes without prior written permission.
             </p>
 
             <h2 style="font-family:var(--font-heading,serif);font-weight:700;color:var(--blue-deep);font-size:1.3rem;margin-top:32px;margin-bottom:12px;">6. Third-Party Services</h2>
@@ -48,7 +48,7 @@
 
             <h2 style="font-family:var(--font-heading,serif);font-weight:700;color:var(--blue-deep);font-size:1.3rem;margin-top:32px;margin-bottom:12px;">7. Limitation of Liability</h2>
             <p style="color:var(--blue-deep);line-height:1.8;margin-bottom:20px;">
-                The website is provided "as is" without warranties of any kind. To the fullest extent permitted by law, Sto. Rosario Parish shall not be liable for any direct or indirect damages arising from the use of, or reliance on, this website, its content, or its services.
+                The website is provided "as is" without warranties of any kind. To the fullest extent permitted by law, Paroisse Saint-Joseph Artisan shall not be liable for any direct or indirect damages arising from the use of, or reliance on, this website, its content, or its services.
             </p>
 
             <h2 style="font-family:var(--font-heading,serif);font-weight:700;color:var(--blue-deep);font-size:1.3rem;margin-top:32px;margin-bottom:12px;">8. Governing Law</h2>
@@ -66,9 +66,9 @@
                 For questions about these Terms &amp; Conditions, please contact us:
             </p>
             <p style="color:var(--blue-deep);line-height:1.9;margin-top:8px;">
-                Sto. Rosario Parish<br>
-                1 Sto. Rosario Drive, Pacita, San Pedro, Laguna, Philippines 4023<br>
-                Email: officestorosarioparish@gmail.com<br>
+                Paroisse Saint-Joseph Artisan<br>
+                Paroisse St Joseph https://maps.app.goo.gl/ineJKGS5ux346zJR9<br>
+                Email: paroisse.stjoseph.bonoumin@gmail.com<br>
                 Phone: (02) 8869 2742
             </p>
         </div>

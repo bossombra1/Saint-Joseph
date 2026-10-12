@@ -49,9 +49,9 @@ return [
     ],
 
     'parish' => [
-        'office_email' => env('PARISH_OFFICE_EMAIL', 'officestorosarioparish@gmail.com'),
-        'youtube_channel_id' => env('PARISH_YOUTUBE_CHANNEL_ID', 'UCUlt4H2yiuABKt7xwrZDBLg'),
-        'facebook_page_url' => env('PARISH_FACEBOOK_URL', 'https://www.facebook.com/storosarioparishpacita1'),
+        'office_email' => env('PARISH_OFFICE_EMAIL', 'paroisse.stjoseph.bonoumin@gmail.com'),
+        'youtube_channel_id' => env('PARISH_YOUTUBE_CHANNEL_ID', 'https://www.youtube.com/@KEPHATV'),
+        'facebook_page_url' => env('PARISH_FACEBOOK_URL', 'https://www.facebook.com/saintjosephartisanrivierabonoumin?locale=fr_FR'),
     ],
 
     'google' => [

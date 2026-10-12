@@ -1,6 +1,6 @@
 <x-public-layout>
 <x-slot name="meta">
-    <meta name="description" content="Browse all photo and video albums from the Sto. Rosario Parish community.">
+    <meta name="description" content="Browse all photo and video albums from the Paroisse Saint-Joseph Artisan community.">
 </x-slot>
 
 {{-- ═══════════════ HERO ═══════════════ --}}

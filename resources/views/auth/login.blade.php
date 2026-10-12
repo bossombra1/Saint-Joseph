@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Staff Login — Sto. Rosario Parish</title>
+    <title>Staff Login — Paroisse Saint-Joseph Artisan</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preload" href="{{ asset('fonts/Canterbury.ttf') }}" as="font" type="font/ttf" crossorigin>
     <style>
@@ -510,7 +510,7 @@
         <aside class="login-brand" aria-hidden="true">
             {{-- Background image matching hero section --}}
             <div class="login-brand-bg">
-                <img src="{{ \Illuminate\Support\Facades\asset('images/parish-logo.png') }}" alt="" aria-hidden="true" fetchpriority="high" decoding="async">
+                <img src="{{ asset('images/parish-logo.png') }}" alt="" aria-hidden="true" fetchpriority="high" decoding="async">
                 <div class="login-brand-overlay"></div>
                 <div class="login-brand-radial"></div>
             </div>
@@ -550,8 +550,8 @@
             </div>
 
             <div class="brand-content">
-                <div class="brand-cross"><img src="{{ asset('images/parish-logo.png') }}" alt="Sto. Rosario Parish Logo"></div>
-                <h1 class="brand-title">Sto. Rosario Parish</h1>
+                <div class="brand-cross"><img src="{{ asset('images/parish-logo.png') }}" alt="Paroisse Saint-Joseph Artisan Logo"></div>
+                <h1 class="brand-title">Paroisse Saint-Joseph Artisan</h1>
                 <p class="brand-subtitle">Staff Administration</p>
                 <div class="brand-divider"></div>
                 <p class="brand-quote">
@@ -569,8 +569,8 @@
 
                 {{-- Mobile brand header --}}
                 <div class="mobile-brand">
-                    <div class="mobile-brand-cross"><img src="{{ asset('images/parish-logo.png') }}" alt="Sto. Rosario Parish Logo"></div>
-                    <p class="mobile-brand-title">Sto. Rosario Parish</p>
+                    <div class="mobile-brand-cross"><img src="{{ asset('images/parish-logo.png') }}" alt="Paroisse Saint-Joseph Artisan Logo"></div>
+                    <p class="mobile-brand-title">Paroisse Saint-Joseph Artisan</p>
                     <p class="mobile-brand-sub">Staff Login</p>
                 </div>
 

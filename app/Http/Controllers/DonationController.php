@@ -85,7 +85,7 @@ class DonationController extends Controller
             'success_url' => route('donate.success').'?donation_id='.$donation->id,
             'cancel_url' => route('donate.cancel').'?donation_id='.$donation->id,
             'reference_number' => 'DON-'.strtoupper(substr($donation->id, 0, 8)),
-            'description' => 'Sto. Rosario Parish — '.$validated['purpose'],
+            'description' => 'Paroisse Saint-Joseph Artisan — '.$validated['purpose'],
         ];
 
         $billing = array_filter([

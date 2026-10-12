@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Sto. Rosario Parish') }}</title>
+    <title>{{ config('app.name', 'Paroisse Saint-Joseph Artisan') }}</title>
     <script>document.documentElement.className='js';</script>
 
     <!-- Fonts Preload -->
@@ -22,7 +22,7 @@
     @if(isset($meta))
         {{ $meta }}
     @else
-        <meta name="description" content="Official website of Sto. Rosario Parish - Pacita. Providing spiritual guidance, sacramental services, and community outreach in San Pedro, Laguna.">
+        <meta name="description" content="Official website of Paroisse Saint-Joseph Artisan - Pacita. Providing spiritual guidance, sacramental services, and community outreach in San Pedro, Laguna.">
     @endif
     
     <!-- Open Graph / Facebook -->
@@ -33,15 +33,15 @@
     @endphp
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="{{ config('app.name', 'Sto. Rosario Parish') }}">
-    <meta property="og:description" content="{{ $meta_description ?? 'Official website of Sto. Rosario Parish - Pacita. Providing spiritual guidance, sacramental services, and community outreach in San Pedro, Laguna.' }}">
+    <meta property="og:title" content="{{ config('app.name', 'Paroisse Saint-Joseph Artisan') }}">
+    <meta property="og:description" content="{{ $meta_description ?? 'Official website of Paroisse Saint-Joseph Artisan - Pacita. Providing spiritual guidance, sacramental services, and community outreach in San Pedro, Laguna.' }}">
     <meta property="og:image" content="{{ $ogImageUrl }}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ url()->current() }}">
-    <meta property="twitter:title" content="{{ $title ?? 'Sto. Rosario Parish' }} | Divine Grace & Community">
-    <meta property="twitter:description" content="{{ $description ?? 'Official portal of Sto. Rosario Parish - Pacita 1. Experience our community of faith through daily masses, sacraments, and spiritual activities.' }}">
+    <meta property="twitter:title" content="{{ $title ?? 'Paroisse Saint-Joseph Artisan' }} | Divine Grace & Community">
+    <meta property="twitter:description" content="{{ $description ?? 'Official portal of Paroisse Saint-Joseph Artisan - Riviera Bonoumin. Experience our community of faith through daily masses, sacraments, and spiritual activities.' }}">
     <meta property="twitter:image" content="{{ $ogImageUrl }}">
     
     <!-- Favicon (works on all devices) -->

@@ -48,7 +48,7 @@ class InquirySubmitted extends Notification
 
         return $mail->line('Our parish team is reviewing your request and will get back to you soon.')
             ->action('Track Status', route('track.status', ['refId' => $this->inquiry->reference_id]))
-            ->line('Thank you for contacting Sto. Rosario Parish.');
+            ->line('Thank you for contacting Paroisse Saint-Joseph Artisan.');
     }
 
     private function getRequirements($type)
@@ -57,7 +57,7 @@ class InquirySubmitted extends Notification
             'Baptism' => [
                 'Birth Certificate with Registry Number (Original & Photocopy)',
                 'Photocopy of Marriage Contract (If parents are married)',
-                'Original Copy of Baptismal Permit (If not Pacita 1 residents)',
+                'Original Copy of Baptismal Permit (If not Riviera Bonoumin residents)',
                 'Registration Fee of ₱500.00 (Fixed Amount)'
             ],
             'First Communion' => ['Photocopy of Baptismal Certificate'],

@@ -1,7 +1,7 @@
 <x-public-layout>
     <x-slot name="meta">
         <meta name="description" content="{{ Str::limit(strip_tags($announcement->content), 160) }}">
-        <meta property="og:title" content="{{ $announcement->title }} | Sto. Rosario Parish">
+        <meta property="og:title" content="{{ $announcement->title }} | Paroisse Saint-Joseph Artisan">
         <meta property="og:description" content="{{ Str::limit(strip_tags($announcement->content), 160) }}">
     </x-slot>
 

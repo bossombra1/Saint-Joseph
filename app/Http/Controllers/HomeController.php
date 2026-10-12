@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
+use App\Models\Event;
 use App\Models\MassSchedule;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -18,111 +19,187 @@ class HomeController extends Controller
                 ->get();
         });
 
-        // Enhanced "Next Mass" logic: find the closest mass by searching through the week
         $now = Carbon::now('Asia/Manila');
-        $daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        
-        $nextMass = null;
-        for ($i = 0; $i < 7; $i++) {
-            $checkDayIndex = ($now->dayOfWeek + $i) % 7;
-            $dayName = $daysOfWeek[$checkDayIndex];
-            
-            $masses = \Illuminate\Support\Facades\Cache::remember("active_masses_{$dayName}", now()->addHours(24), function() use ($dayName) {
-                return MassSchedule::where('is_active', true)
-                    ->where(function($q) use ($dayName) {
-                        $q->whereJsonContains('day_of_week', $dayName);
-                        
-                        if ($dayName === 'Sunday') {
-                            $q->orWhere('mass_type', 'sunday');
-                        } elseif ($dayName === 'Saturday') {
-                            $q->orWhere('mass_type', 'saturday')
-                              ->orWhere('mass_type', 'anticipated');
-                        }
-                    })
-                    ->get();
-            });
-                
-            $upcomingMassesToday = [];
-            foreach ($masses as $mass) {
-                $times = is_array($mass->time) ? $mass->time : (is_string($mass->time) ? json_decode($mass->time, true) : []);
-                if (!$times) continue;
+        $nextMass = $this->findNextMass($now);
 
-                foreach (array_filter($times) as $t) {
-                    try {
-                        // Force Asia/Manila timezone to avoid UTC offset bugs on Render
-                        if (str_contains($t, 'AM') || str_contains($t, 'PM')) {
-                             $massTime = Carbon::createFromFormat('g:i A', trim($t), 'Asia/Manila');
-                        } else {
-                             // Handle H:i (e.g. 18:00)
-                             $massTime = Carbon::createFromFormat('H:i', trim($t), 'Asia/Manila');
-                        }
-                        
-                        // Set base date to today then add $i days
-                        $massTime->setDate($now->year, $now->month, $now->day)->addDays($i);
-                        $massEndTime = (clone $massTime)->addHour();
-                        
-                        // Scenario 1: Ongoing (Within 1 hour of start)
-                        if ($now->between($massTime, $massEndTime)) {
-                            $nextMass = clone $mass;
-                            $nextMass->calculated_time = $massTime->format('g:i A');
-                            $nextMass->calculated_day = 'Ongoing';
-                            break 3; // Break out of all loops!
-                        }
-                        
-                        // Scenario 2: Upcoming
-                        if ($now->lessThan($massTime)) {
-                            $m = clone $mass;
-                            $m->calculated_time = $massTime->format('g:i A');
-                            $m->calculated_day = ($i === 0) ? 'Today' : (($i === 1) ? 'Tomorrow' : $dayName);
-                            // Store by timestamp to sort later
-                            $upcomingMassesToday[$massTime->timestamp] = $m;
-                        }
-                    } catch (\Exception $e) {
+        $upcomingEvents = Event::where('is_published', true)
+            ->get()
+            ->map(function (Event $event) use ($now) {
+                $occurrence = $this->nextEventOccurrence($event, $now);
+                if ($occurrence === null) {
+                    return null;
+                }
+
+                $event->setAttribute('home_occurrence_date', $occurrence['date']->toDateString());
+                $event->setAttribute('home_occurrence_at', $occurrence['at']->timestamp);
+                $event->setAttribute('home_transition_at', $occurrence['transition']->timestamp);
+
+                return $event;
+            })
+            ->filter()
+            ->sortBy('home_occurrence_at')
+            ->take(2)
+            ->values();
+
+        $refreshTimes = $upcomingEvents->pluck('home_transition_at')->all();
+        if ($nextMass) {
+            $refreshTimes[] = $nextMass->home_transition_at;
+        }
+        $nextHomeRefreshAt = $refreshTimes ? min($refreshTimes) : null;
+
+        return view('home', compact('announcements', 'nextMass', 'upcomingEvents', 'nextHomeRefreshAt'));
+    }
+
+    private function findNextMass(Carbon $now): ?MassSchedule
+    {
+        $timezone = $now->getTimezone()->getName();
+        $nextMass = null;
+        $nextMassAt = null;
+
+        foreach (MassSchedule::where('is_active', true)->get() as $mass) {
+            $days = is_array($mass->day_of_week) ? $mass->day_of_week : (array) $mass->day_of_week;
+            $days = array_map(fn ($day) => strtolower(trim((string) $day)), $days);
+
+            if ($mass->mass_type === 'sunday') {
+                $days[] = 'sunday';
+            } elseif (in_array($mass->mass_type, ['saturday', 'anticipated'], true)) {
+                $days[] = 'saturday';
+            }
+
+            if ($mass->specific_date) {
+                $dates = [Carbon::parse($mass->specific_date->toDateString(), $timezone)->startOfDay()];
+            } else {
+                $dates = [];
+                for ($offset = 0; $offset <= 7; $offset++) {
+                    $date = $now->copy()->startOfDay()->addDays($offset);
+                    if (in_array(strtolower($date->format('l')), $days, true)) {
+                        $dates[] = $date;
+                    }
+                }
+            }
+
+            $times = is_array($mass->time) ? $mass->time : [$mass->time];
+            foreach ($dates as $date) {
+                foreach ($times as $time) {
+                    if (is_array($time)) {
+                        $time = $time['time'] ?? null;
+                    }
+                    if (! is_string($time) || trim($time) === '') {
                         continue;
                     }
-                }
-            }
-            
-            if (!empty($upcomingMassesToday)) {
-                ksort($upcomingMassesToday);
-                $nextMass = reset($upcomingMassesToday);
-                break;
-            }
-        }
-        
-        // Absolute fallback to first Sunday mass if nothing else matches
-        if (!$nextMass) {
-            $nextMass = \Illuminate\Support\Facades\Cache::remember('fallback_sunday_mass', now()->addHours(24), function() {
-                return MassSchedule::where('is_active', true)
-                    ->where('mass_type', 'sunday')
-                    ->orderByRaw('time->>0 asc')
-                    ->first();
-            });
 
-            if ($nextMass) {
-                $times = is_array($nextMass->time) ? $nextMass->time : (is_string($nextMass->time) ? json_decode($nextMass->time, true) : []);
-                $fallbackTime = $times[0] ?? '6:00 AM';
-                try {
-                    if (str_contains($fallbackTime, 'AM') || str_contains($fallbackTime, 'PM')) {
-                        $nextMass->calculated_time = Carbon::createFromFormat('g:i A', $fallbackTime, 'Asia/Manila')->format('g:i A');
-                    } else {
-                        $nextMass->calculated_time = Carbon::createFromFormat('H:i', $fallbackTime, 'Asia/Manila')->format('g:i A');
+                    try {
+                        $parsedTime = Carbon::parse(trim($time), $timezone);
+                    } catch (\Throwable $exception) {
+                        continue;
                     }
-                } catch (\Exception $e) {
-                    $nextMass->calculated_time = $fallbackTime;
+
+                    $candidate = $date->copy()->setTime($parsedTime->hour, $parsedTime->minute);
+                    if ($candidate->lessThanOrEqualTo($now)) {
+                        continue;
+                    }
+
+                    if ($nextMassAt === null || $candidate->lessThan($nextMassAt)) {
+                        $locale = app()->getLocale();
+                        $localizedDate = $candidate->copy()->locale($locale);
+                        $day = $candidate->isSameDay($now)
+                            ? ($locale === 'fr' ? 'Aujourd’hui' : 'Today')
+                            : ($candidate->isSameDay($now->copy()->addDay())
+                                ? ($locale === 'fr' ? 'Demain' : 'Tomorrow')
+                                : ucfirst($localizedDate->isoFormat('dddd')));
+
+                        $nextMass = clone $mass;
+                        $nextMass->calculated_day = $day;
+                        $nextMass->calculated_time = $localizedDate->isoFormat($locale === 'fr' ? 'HH:mm' : 'h:mm A');
+                        $nextMass->home_transition_at = $candidate->copy()->addSecond()->timestamp;
+                        $nextMassAt = $candidate;
+                    }
                 }
-                $nextMass->calculated_day = 'Sunday';
             }
         }
 
-        $upcomingEvents = \Illuminate\Support\Facades\Cache::remember('home_upcoming_events', now()->addMinutes(60), function() use ($now) {
-            return \App\Models\Event::where('is_published', true)
-                ->whereDate('event_date', '>=', $now->toDateString())
-                ->orderBy('event_date', 'asc')
-                ->take(2)
-                ->get();
-        });
+        return $nextMass;
+    }
 
-        return view('home', compact('announcements', 'nextMass', 'upcomingEvents'));
+    private function nextEventOccurrence(Event $event, Carbon $now): ?array
+    {
+        if (! $event->event_date) {
+            return null;
+        }
+
+        $timezone = $now->getTimezone()->getName();
+        $eventDate = Carbon::parse($event->event_date->toDateString(), $timezone)->startOfDay();
+        $slots = is_array($event->event_time) ? $event->event_time : ($event->event_time ? [$event->event_time] : []);
+        if (isset($slots['time'])) {
+            $slots = [$slots];
+        }
+
+        if ($slots === []) {
+            if ($eventDate->copy()->endOfDay()->lessThanOrEqualTo($now)) {
+                return null;
+            }
+
+            return [
+                'date' => $eventDate->greaterThan($now) ? $eventDate : $now->copy()->startOfDay(),
+                'at' => $eventDate->greaterThan($now) ? $eventDate : $now,
+                'transition' => $eventDate->copy()->endOfDay()->addSecond(),
+            ];
+        }
+
+        $nextOccurrence = null;
+        foreach ($slots as $slot) {
+            $details = is_array($slot) ? $slot : ['time' => $slot];
+            try {
+                $startDate = ! empty($details['date'])
+                    ? Carbon::parse($details['date'], $timezone)->startOfDay()
+                    : $eventDate->copy();
+                $endDate = ! empty($details['date_to'])
+                    ? Carbon::parse($details['date_to'], $timezone)->startOfDay()
+                    : $startDate->copy();
+            } catch (\Throwable $exception) {
+                continue;
+            }
+
+            if ($endDate->copy()->endOfDay()->lessThanOrEqualTo($now)) {
+                continue;
+            }
+
+            if ($endDate->greaterThan($startDate)) {
+                $occurrence = [
+                    'date' => $startDate->greaterThan($now) ? $startDate : $now->copy()->startOfDay(),
+                    'at' => $startDate->greaterThan($now) ? $startDate : $now,
+                    'transition' => $endDate->copy()->endOfDay()->addSecond(),
+                ];
+            } elseif (empty($details['time'])) {
+                $occurrence = [
+                    'date' => $startDate->greaterThan($now) ? $startDate : $now->copy()->startOfDay(),
+                    'at' => $startDate->greaterThan($now) ? $startDate : $now,
+                    'transition' => $startDate->copy()->endOfDay()->addSecond(),
+                ];
+            } else {
+                try {
+                    $parsedTime = Carbon::parse(trim((string) $details['time']), $timezone);
+                } catch (\Throwable $exception) {
+                    continue;
+                }
+
+                $occurrenceAt = $startDate->copy()->setTime($parsedTime->hour, $parsedTime->minute);
+                if ($occurrenceAt->lessThanOrEqualTo($now)) {
+                    continue;
+                }
+
+                $occurrence = [
+                    'date' => $startDate,
+                    'at' => $occurrenceAt,
+                    'transition' => $occurrenceAt->copy()->addSecond(),
+                ];
+            }
+
+            if ($nextOccurrence === null || $occurrence['at']->lessThan($nextOccurrence['at'])) {
+                $nextOccurrence = $occurrence;
+            }
+        }
+
+        return $nextOccurrence;
     }
 }

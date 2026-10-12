@@ -69,12 +69,12 @@ class RAGService
                 'title' => 'Office Hours and Location',
                 'keywords' => ['office', 'hours', 'open', 'close', 'closed', 'location', 'address', 'saan', 'oras', 'bukas', 'pacita', 'san pedro', 'laguna'],
                 'priority' => 1,
-                'content' => "Address: 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna 4023.\nOffice Hours: Tuesday to Saturday: 6:00 AM – 12:00 NN, 1:30 PM – 6:00 PM; Sunday: 6:00 AM – 12:00 NN, 3:00 PM – 6:00 PM; Monday: Closed.",
+                'content' => "Address: Paroisse St Joseph https://maps.app.goo.gl/ineJKGS5ux346zJR9 4023.\nOffice Hours: Tuesday to Saturday: 6:00 AM – 12:00 NN, 1:30 PM – 6:00 PM; Sunday: 6:00 AM – 12:00 NN, 3:00 PM – 6:00 PM; Monday: Closed.",
             ];
 
             // 2. Donation & GCash Info
             $gcashNumber = Setting::where('key', 'gcash_number')->value('value') ?? '09123456789';
-            $gcashName = Setting::where('key', 'gcash_name')->value('value') ?? 'Sto. Rosario Parish';
+            $gcashName = Setting::where('key', 'gcash_name')->value('value') ?? 'Paroisse Saint-Joseph Artisan';
             $chunks[] = [
                 'id' => 'donations',
                 'category' => 'donations',
@@ -189,7 +189,7 @@ class RAGService
                 'title' => 'Parish History and Patroness',
                 'keywords' => ['history', 'about', 'patroness', 'rosary', 'pacita', 'priest', 'pari', 'simbahan', 'church', 'founded'],
                 'priority' => 1,
-                'content' => "Sto. Rosario Parish in Pacita Complex 1, San Pedro, Laguna was canonically erected in 1983. Patroness: Queen of the Most Holy Rosary of Pacita. Parish Priest: {$priestName}." . ($assistantPriestName ? " Assistant Parish Priest: {$assistantPriestName}." : "") . " Image declared Important Cultural Property of San Pedro (2024) and 'Queen of the City of San Pedro' (2025).",
+                'content' => "Paroisse Saint-Joseph Artisan in Riviera Bonoumin Cocody, Abidjan, Côte d'Ivoire was canonically erected in 2010. Patroness: Queen of the Most Holy Rosary of Pacita. Parish Priest: {$priestName}." . ($assistantPriestName ? " Assistant Parish Priest: {$assistantPriestName}." : "") . " Image declared Important Cultural Property of San Pedro (2024) and 'Queen of the City of San Pedro' (2025).",
             ];
 
             return $chunks;
@@ -255,7 +255,7 @@ class RAGService
         $priest = Setting::where('key', 'priest_name')->value('value') ?? 'Rev. Fr. Parish Priest';
 
         return "CURRENT DATE & TIME: " . now('Asia/Manila')->format('l, F j, Y h:i A') . " (Philippine Time)\n\n" .
-            "Sto. Rosario Parish (Pacita, San Pedro, Laguna).\n" .
+            "Paroisse Saint-Joseph Artisan (Riviera Bonoumin, Abidjan, Côte d'Ivoire).\n" .
             "- Parish Priest: {$priest}\n" .
             "- Office Hours: Tue-Sat 6:00 AM–12:00 NN & 1:30–6:00 PM; Sun 6:00 AM–12:00 NN & 3:00–6:00 PM; Mon Closed.\n" .
             "- Contact: {$contact}\n" .

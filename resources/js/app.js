@@ -94,7 +94,7 @@ Alpine.store('ui', {
                 if (this._chatNotified && d.last_user_message_id > this._lastMsgId) {
                     Alpine.store('toast').trigger('New message from a parishioner', 'success');
                     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-                        new Notification('Sto. Rosario Parish', { body: 'New message from a parishioner' });
+                        new Notification('Paroisse Saint-Joseph Artisan', { body: 'New message from a parishioner' });
                     }
                 }
                 this._chatNotified = true;
@@ -111,3 +111,7 @@ window.Alpine = Alpine;
 Alpine.start();
 
 import './locale-ui';
+
+if (document.querySelector('[data-bulletin-reader]')) {
+    import('./bulletin-reader');
+}

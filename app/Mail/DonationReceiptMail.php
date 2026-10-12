@@ -20,7 +20,7 @@ class DonationReceiptMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Donation Receipt - Sto. Rosario Parish',
+            subject: 'Donation Receipt - Paroisse Saint-Joseph Artisan',
         );
     }
 

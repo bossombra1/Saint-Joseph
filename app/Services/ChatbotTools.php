@@ -360,7 +360,7 @@ class ChatbotTools
                 'fee' => '₱500.00 Registration Fee',
                 'requirements' => [
                     "Child's PSA or Local Civil Registrar (LCR) Birth Certificate",
-                    "Baptismal Permit (from parish of residence if residing outside Sto. Rosario Parish Pacita)",
+                    "Baptismal Permit (from parish of residence if residing outside Paroisse Saint-Joseph Artisan Pacita)",
                     "Pre-Jordan Catechetical Seminar for parents and primary sponsors/godparents",
                 ],
                 'schedule' => 'Regular Baptisms scheduled every Sunday; Special Baptisms by appointment with parish office.',

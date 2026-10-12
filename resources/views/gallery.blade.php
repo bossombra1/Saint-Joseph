@@ -1,6 +1,6 @@
 <x-public-layout>
 <x-slot name="meta">
-    <meta name="description" content="Explore photo and video highlights from the Sto. Rosario Parish community in our official gallery.">
+    <meta name="description" content="Explore photo and video highlights from the Paroisse Saint-Joseph Artisan community in our official gallery.">
     <style>
         .eyebrow {
             font-size: 10px; font-weight: 600;
@@ -174,7 +174,7 @@
     <div class="font-cinzel" style="position:absolute; font-size:360px; color:rgba(255,255,255,0.018);
                 line-height:1; pointer-events:none; user-select:none;">✝</div>
 
-    <div style="position:relative; z-index:10; text-align:center; padding:80px 24px 60px;">
+    <div style="position:relative; z-index:10; text-align:center; padding:132px 24px 60px;">
         <div class="divider-ornament mb-5">
             <span class="eyebrow" style="color:rgba(245,197,24,0.75);">Capturing Moments</span>
         </div>
@@ -182,7 +182,7 @@
             style="font-size:clamp(2.8rem,7vw,6rem); font-weight:700; font-style:italic;
                    letter-spacing:-0.02em; color:#EBF2FF; line-height:1; margin-bottom:20px;
                    text-shadow:0 4px 48px rgba(0,0,0,0.4);">
-            Gallery
+            Parish Gallery
         </h1>
         <div style="width:48px; height:1px; margin:0 auto 20px;
                     background:linear-gradient(90deg,transparent,rgba(245,197,24,0.7),transparent);"></div>
@@ -217,7 +217,7 @@
         </p>
     </div>
 
-    @else
+    @endif
     @php
         $featured    = $albums->first();
         $otherAlbums = $albums->slice(1);
@@ -252,23 +252,23 @@
             {{-- THE VIDEO --}}
             @if($isExternal)
                 <iframe class="highlight-video"
-                        src="{{ $v->video_url }}"
+                        src="{{ $v->embed_url }}"
                         style="width:100%; height:100%; border:0; display:block; position:relative; z-index:1;"
                         frameborder="0" allowfullscreen
                         allow="accelerometer autoplay clipboard-write encrypted-media gyroscope web-share"
                         referrerpolicy="strict-origin-when-cross-origin"
                         title="{{ $v->title }}"></iframe>
             @else
-                <video id="hv-0" class="highlight-video"
-                       src="{{ $v->video_url }}"
+                  <video id="hv-0" class="highlight-video"
                        playsinline preload="metadata"
                        style="width:100%; height:100%; object-fit:cover; display:block; position:relative; z-index:1;"
                        onclick="toggleVideoPlay(0)"
                        onplay="syncVideoUI(0, true)"
                        onpause="syncVideoUI(0, false)"
                        ontimeupdate="updateVideoProgress(0)"
-                       onended="onVideoEnded(0)"
-                       onloadedmetadata="document.getElementById('time-dur-0').innerText = Math.floor(this.duration / 60) + ':' + Math.floor(this.duration % 60).toString().padStart(2, '0')">
+                              onended="onVideoEnded(0)"
+                              onloadedmetadata="document.getElementById('time-dur-0').innerText = Math.floor(this.duration / 60) + ':' + Math.floor(this.duration % 60).toString().padStart(2, '0')">
+                          <source src="{{ $v->video_url }}" type="{{ $v->video_mime_type }}">
                 </video>
 
                 {{-- Center Play/Pause Circle Overlay --}}
@@ -441,6 +441,7 @@
     </section>
     @endif
 
+    @if($featured)
     {{-- ═══════════════ FEATURED ALBUM ═══════════════ --}}
     <section class="reveal" style="padding:4rem 1.5rem 0; max-width:1100px; margin:0 auto 5rem;">
         <div class="divider-ornament mb-8" style="justify-content:flex-start;">
@@ -508,6 +509,7 @@
             </div>
         </a>
     </section>
+    @endif
 
     {{-- ═══════════════ MORE GALLERIES ═══════════════ --}}
     @if($otherAlbums->isNotEmpty())
@@ -519,7 +521,7 @@
             <div style="flex:1; height:1px; background:linear-gradient(90deg,rgba(26,64,128,0.12),transparent);"></div>
         </div>
 
-        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:2rem;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr)); gap:2rem;">
             @foreach($otherAlbums as $album)
             <a href="{{ route('gallery.album', $album) }}"
                class="group card-sacred"
@@ -669,7 +671,6 @@
         </div>
     </section>
     @endif
-    @endif
 
     {{-- ═══════════════ STAY CONNECTED / SOCIAL FEED ═══════════════ --}}
     <section class="social-feed-section reveal" style="background:var(--cream, #F7F9FF); position:relative; padding-top:64px; padding-bottom:80px;">
@@ -714,7 +715,7 @@
                             src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v19.0"></script>
 
                     <div class="fb-page"
-                         data-href="https://www.facebook.com/storosarioparishpacita1"
+                         data-href="https://www.facebook.com/saintjosephartisanrivierabonoumin?locale=fr_FR"
                          data-tabs="timeline"
                          data-width="500"
                          data-height="700"
@@ -729,7 +730,7 @@
 
             {{-- CTA Buttons --}}
             <div class="social-feed-cta-row" style="gap:0.75rem;">
-                <a href="https://www.facebook.com/storosarioparishpacita1" target="_blank" rel="noopener noreferrer"
+                <a href="https://www.facebook.com/saintjosephartisanrivierabonoumin?locale=fr_FR" target="_blank" rel="noopener noreferrer"
                    class="social-feed-cta-gold">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>

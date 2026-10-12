@@ -1,6 +1,6 @@
 @php
     $home = route('home');
-    $email = config('services.parish.office_email', 'officestorosarioparish@gmail.com');
+    $email = config('services.parish.office_email', 'paroisse.stjoseph.bonoumin@gmail.com');
 @endphp
 
 <x-public-layout>

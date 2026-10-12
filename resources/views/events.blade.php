@@ -1,6 +1,6 @@
 <x-public-layout>
 <x-slot name="meta">
-    <meta name="description" content="Stay updated with the latest events and celebrations at Sto. Rosario Parish. Join our community activities and spiritual gatherings.">
+    <meta name="description" content="Stay updated with the latest events and celebrations at Paroisse Saint-Joseph Artisan. Join our community activities and spiritual gatherings.">
     <style>
         .eyebrow {
             font-size: 10px; font-weight: 600;
@@ -219,7 +219,7 @@
     },
     get monthName() {
         return new Date(this.calYear, this.calMonth - 1, 1)
-            .toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            .toLocaleDateString(document.documentElement.lang, { month: 'long', year: 'numeric' });
     },
     get daysInMonth() {
         return new Date(this.calYear, this.calMonth, 0).getDate();
@@ -251,7 +251,7 @@
     },
     downloadICS(title, desc, start, end, loc) {
         const ics = [
-            'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Sto. Rosario Parish//EN',
+            'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Paroisse Saint-Joseph Artisan//EN',
             'BEGIN:VEVENT',
             'UID:' + Math.random().toString(36).substr(2,9) + '@storosario',
             'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z',
@@ -513,7 +513,7 @@
                 <div class="flex items-center gap-4 text-sm text-primary/60">
                     <span class="flex items-center gap-1.5">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                        <span x-text="selectedEvent?.event_date ? new Date(selectedEvent.event_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : ''"></span>
+                        <span x-text="selectedEvent?.event_date ? new Date(selectedEvent.event_date + 'T00:00:00').toLocaleDateString(document.documentElement.lang, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : ''"></span>
                     </span>
                 </div>
                 <template x-if="selectedEvent?.event_time && selectedEvent.event_time.length > 0">
@@ -535,9 +535,9 @@
                                 <span x-show="group[0]" x-text="group[0] + ' \u00b7 '" class="text-[10px] uppercase font-black tracking-wider text-primary/60"></span>
                                 <template x-for="(slot, si) in group[1]" :key="si">
                                     <span>
-                                        <span x-show="slot.date" x-text="slot.date ? new Date(slot.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + (slot.date_to ? ' \u2013 ' + new Date(slot.date_to + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '') : ''"></span>
+                                        <span x-show="slot.date" x-text="slot.date ? new Date(slot.date + 'T00:00:00').toLocaleDateString(document.documentElement.lang, { month: 'short', day: 'numeric' }) + (slot.date_to ? ' \u2013 ' + new Date(slot.date_to + 'T00:00:00').toLocaleDateString(document.documentElement.lang, { month: 'short', day: 'numeric' }) : '') : ''"></span>
                                         <span x-show="slot.date && slot.time" style="opacity:0.30;">\u00b7</span>
-                                        <span x-text="slot.time ? new Date('2000-01-01T' + slot.time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : ''"></span>
+                                        <span x-text="slot.time ? new Date('2000-01-01T' + slot.time).toLocaleTimeString(document.documentElement.lang, { hour: 'numeric', minute: '2-digit' }) : ''"></span>
                                         <span x-show="si < group[1].length - 1" style="opacity:0.30;">\u00b7</span>
                                     </span>
                                 </template>
@@ -585,7 +585,7 @@
             Stay connected with the parish. View the latest news, novenas, and community updates.
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="https://www.facebook.com/storosarioparishpacita1" target="_blank" rel="noopener noreferrer"
+            <a href="https://www.facebook.com/saintjosephartisanrivierabonoumin?locale=fr_FR" target="_blank" rel="noopener noreferrer"
                class="gold-btn inline-flex items-center gap-2.5 px-10 py-4 rounded-full text-[11px] font-bold uppercase tracking-widest"
                style="text-decoration:none;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>

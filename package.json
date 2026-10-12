@@ -14,5 +14,9 @@
         "laravel-vite-plugin": "^2.0.0",
         "tailwindcss": "^4.2.2",
         "vite": "^7.0.7"
+    },
+    "dependencies": {
+        "page-flip": "^2.0.7",
+        "pdfjs-dist": "^6.4.299"
     }
 }

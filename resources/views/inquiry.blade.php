@@ -1,6 +1,6 @@
 <x-public-layout>
 <x-slot name="meta">
-    <meta name="description" content="Parish inquiries – sacraments, blessings, and document requests at Sto. Rosario Parish, Pacita, San Pedro, Laguna.">
+    <meta name="description" content="Parish inquiries – sacraments, blessings, and document requests at Paroisse Saint-Joseph Artisan, Riviera Bonoumin, Abidjan, Côte d'Ivoire.">
     <style>
 
         .eyebrow {
@@ -289,7 +289,7 @@
         <p class="font-heading animate-fade-up delay-2"
            style="font-style:italic; color:rgba(245,197,24,0.75);
                   font-size:clamp(0.9rem,1.8vw,1.1rem); font-weight:300;">
-            Pacita Complex 1, San Pedro, Laguna
+            Riviera Bonoumin Cocody, Abidjan, Côte d'Ivoire
         </p>
     </div>
 
@@ -476,7 +476,7 @@
                 'Baptism': [
                     'Birth Certificate with Registry Number (Original & Photocopy)',
                     'Photocopy of Marriage Contract (If parents are married)',
-                    'Original Copy of Baptismal Permit (If not Pacita 1 residents)',
+                    'Original Copy of Baptismal Permit (If not Riviera Bonoumin residents)',
                     'Registration Fee: Php 500.00 (Fixed Amount)'
                 ],
                 'First Communion': ['Photocopy of Baptismal Certificate'],
@@ -770,7 +770,7 @@
                                             <ul class="space-y-1.5 text-left text-sm text-blue-800/70">
                                                 <li>1. Birth Certificate with Registry Number (Original & Photocopy)</li>
                                                 <li>2. Photocopy of Marriage Contract (If parents are married)</li>
-                                                <li>3. Original Copy of Baptismal Permit (If not Pacita 1 residents)</li>
+                                                <li>3. Original Copy of Baptismal Permit (If not Riviera Bonoumin residents)</li>
                                                 <li>4. Registration Fee of ₱500.00 (Fixed Amount)</li>
                                             </ul>
                                         </div>

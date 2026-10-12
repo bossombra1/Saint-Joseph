@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Admin — Sto. Rosario Parish</title>
+    <title>Admin — Paroisse Saint-Joseph Artisan</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
     <style>
@@ -91,7 +91,7 @@
                         <span class="w-8 h-8" style="background:#0D2A52;-webkit-mask:url('/images/parish-logo.png') center/contain no-repeat;mask:url('/images/parish-logo.png') center/contain no-repeat;"></span>
                     </div>
                     <div x-show="$store.ui.sidebarOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-x-2" x-transition:enter-end="opacity-100 translate-x-0">
-                        <p class="font-heading font-bold text-[15px] tracking-tight leading-tight text-white/95">Sto. Rosario</p>
+                        <p class="font-heading font-bold text-[15px] tracking-tight leading-tight text-white/95">Saint-Joseph Artisan</p>
                         <p class="text-[9px] font-bold uppercase tracking-[.2em] text-accent/70">Admin Panel</p>
                     </div>
                 </div>
@@ -130,6 +130,8 @@
                         :active="request()->is('internal/announcements*')" />
                     <x-admin-nav-link href="{{ route('admin.events.index') }}" icon="sparkles" label="Events"
                         :active="request()->is('internal/events*')" />
+                    <x-admin-nav-link href="{{ route('admin.bulletins.index') }}" icon="book-open" label="Bulletins"
+                        :active="request()->is('internal/bulletins*')" />
                     <x-admin-nav-link href="{{ route('admin.gallery.index') }}" icon="image" label="Gallery"
                         :active="request()->is('internal/gallery*')" />
                     <x-admin-nav-link href="{{ route('admin.highlights.index') }}" icon="clapperboard" label="Video Highlights"

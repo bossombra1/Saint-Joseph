@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class VideoHighlight extends Model
 {
@@ -22,10 +24,26 @@ class VideoHighlight extends Model
     public function getVideoUrlAttribute()
     {
         $value = $this->video_path;
-        if (Str::startsWith($value, ['http', 'https', 'www'])) {
+        if (Str::startsWith($value, ['http://', 'https://'])) {
             return $value;
         }
-        return \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url('highlights/' . $value);
+        if (Str::startsWith($value, 'www.')) {
+            return 'https://' . $value;
+        }
+
+        $path = 'highlights/' . ltrim((string) $value, '/');
+        $diskName = config('filesystems.default');
+
+        if ($diskName === 'local') {
+            return URL::temporarySignedRoute(
+                'storage.local',
+                now()->addDays(7),
+                ['path' => $path],
+                absolute: false
+            );
+        }
+
+        return Storage::disk($diskName)->url($path);
     }
 
     public function getThumbnailUrlAttribute()
@@ -44,7 +62,7 @@ class VideoHighlight extends Model
             return null;
         }
 
-        return \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url('highlights/' . $this->video_path);
+        return null;
     }
 
     public function getEmbedUrlAttribute()
@@ -69,6 +87,16 @@ class VideoHighlight extends Model
 
     public function getIsExternalAttribute()
     {
-        return Str::startsWith($this->video_url, ['http', 'https', 'www']);
+        return Str::startsWith($this->video_url, ['http://', 'https://']);
+    }
+
+    public function getVideoMimeTypeAttribute(): string
+    {
+        return match (strtolower(pathinfo((string) $this->video_path, PATHINFO_EXTENSION))) {
+            'mov' => 'video/quicktime',
+            'ogv' => 'video/ogg',
+            'webm' => 'video/webm',
+            default => 'video/mp4',
+        };
     }
 }

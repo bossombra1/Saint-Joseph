@@ -59,6 +59,8 @@ Route::get('/track-intention/{refId}', [TrackController::class, 'showStatus'])->
 
 // Bulletins
 Route::get('/bulletins', [BulletinController::class, 'index'])->name('bulletins.index');
+Route::get('/bulletins/{bulletin}', [BulletinController::class, 'show'])->name('bulletins.show');
+Route::get('/bulletins/{bulletin}/preview', [BulletinController::class, 'preview'])->name('bulletins.preview');
 Route::get('/bulletins/{bulletin}/download', [BulletinController::class, 'download'])->name('bulletins.download');
 
 // Announcements
@@ -144,9 +146,11 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
         Route::resource('/internal/highlights', VideoHighlightController::class)->names('admin.highlights');
         Route::post('/internal/highlights/reorder', [VideoHighlightController::class, 'reorder'])->name('admin.highlights.reorder');
 
-        // Route::get('/internal/bulletins', [BulletinController::class, 'adminIndex'])->name('admin.bulletins.index');
-        // Route::post('/internal/bulletins', [BulletinController::class, 'store'])->name('admin.bulletins.store');
-        // Route::delete('/internal/bulletins/{bulletin}', [BulletinController::class, 'destroy'])->name('admin.bulletins.destroy');
+        Route::get('/internal/bulletins', [BulletinController::class, 'adminIndex'])->name('admin.bulletins.index');
+        Route::post('/internal/bulletins', [BulletinController::class, 'store'])->name('admin.bulletins.store');
+        Route::get('/internal/bulletins/{bulletin}/preview', [BulletinController::class, 'adminPreview'])->name('admin.bulletins.preview');
+        Route::get('/internal/bulletins/{bulletin}/file', [BulletinController::class, 'preview'])->name('admin.bulletins.file');
+        Route::delete('/internal/bulletins/{bulletin}', [BulletinController::class, 'destroy'])->name('admin.bulletins.destroy');
 
         // Live Chat Admin
         Route::get('/internal/chats', [ChatbotController::class, 'adminIndex'])->name('admin.chats.index');

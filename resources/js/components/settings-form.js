@@ -58,7 +58,6 @@ export const settingsForm = () => ({
         if (this._previewUrls[key]) URL.revokeObjectURL(this._previewUrls[key]);
         this._previewUrls[key] = URL.createObjectURL(file);
         this[key] = this._previewUrls[key];
-        e.target.dispatchEvent(new Event('change', { bubbles: true }));
     },
 
     revokePreviews() {
@@ -110,11 +109,6 @@ export const settingsSection = () => ({
         if (this._submitting) return;
         this._submitting = true;
 
-        const parent = this.$el.closest('[x-data*="settingsForm"]');
-        if (parent && parent.__x) {
-            parent.__x.$data.revokePreviews?.();
-        }
-
         const fd = new FormData(this.$el);
         try {
             const res = await fetch(this.$el.action, {
@@ -131,6 +125,7 @@ export const settingsSection = () => ({
                 this.$store.toast.trigger('Settings saved successfully!', 'success');
                 this._snapshot = this._serialize();
                 this.isDirty = false;
+                window.setTimeout(() => window.location.reload(), 500);
             } else if (res.status === 422) {
                 const data = await res.json();
                 const msg = data.message || Object.values(data.errors || {}).flat().join('\n');

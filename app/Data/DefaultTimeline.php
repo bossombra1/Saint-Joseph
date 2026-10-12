@@ -15,17 +15,17 @@ class DefaultTimeline
                 'full'  => 'Blessed by Rev. Fr. Rey Amante, the image was first housed at the Canta residence, then transferred in procession to the make-shift chapel.',
             ],
             [
-                'year'  => '1983',
+                'year'  => '2010',
                 'badge' => '',
                 'title' => 'Canonical erection',
-                'short' => 'The parish was canonically erected on October 16, 1983.',
+                'short' => 'The parish was canonically erected on October 16, 2010.',
                 'full'  => 'On the same day, the Queen of the Most Holy Rosary of Pacita was officially declared patroness of the parish community.',
             ],
             [
                 'year'  => '1986',
                 'badge' => '',
                 'title' => 'Church dedication',
-                'short' => 'The Sto. Rosario Parish Church was blessed and dedicated on December 6.',
+                'short' => 'The Paroisse Saint-Joseph Artisan Church was blessed and dedicated on December 6.',
                 'full'  => 'Jointly officiated by Msgr. Bruno Torpigliani (Papal Nuncio), Bishop Pedro Bantigue, and Auxiliary Bishop Gabriel Reyes.',
             ],
             [

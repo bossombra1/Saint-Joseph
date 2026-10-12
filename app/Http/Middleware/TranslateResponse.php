@@ -13,19 +13,41 @@ class TranslateResponse
         if(!is_string($content)||$content==='') return $response;
         $translations=json_decode(file_get_contents(lang_path('ui.fr.json')),true)?:[];
         $content=preg_replace_callback('/>([^<>]+)</u',function($m)use($translations){
-            $v=trim(html_entity_decode($m[1],ENT_QUOTES|ENT_HTML5,'UTF-8'));
-            if($v===''||!isset($translations[$v])) return $m[0];
+            $translation=$this->translateValue($m[1],$translations);
+            if($translation===null) return $m[0];
             $lead=substr($m[1],0,strlen($m[1])-strlen(ltrim($m[1])));
             $trail=substr($m[1],strlen(rtrim($m[1])));
-            return '>'.$lead.e($translations[$v]).$trail.'<';
+            return '>'.$lead.e($translation).$trail.'<';
         },$content);
-        foreach(['title','aria-label','placeholder','alt'] as $at){
+        foreach(['title','aria-label','placeholder','alt','label'] as $at){
             $content=preg_replace_callback('/('.$at.'=)(["\'])(.*?)\2/u',function($m)use($translations){
-                $v=html_entity_decode($m[3],ENT_QUOTES|ENT_HTML5,'UTF-8');
-                return isset($translations[$v])?$m[1].$m[2].e($translations[$v]).$m[2]:$m[0];
+                $translation=$this->translateValue($m[3],$translations);
+                return $translation!==null?$m[1].$m[2].e($translation).$m[2]:$m[0];
             },$content);
         }
         $response->setContent($content);
         return $response;
+    }
+
+    private function translateValue(string $value,array $translations): ?string
+    {
+        $value=trim(html_entity_decode($value,ENT_QUOTES|ENT_HTML5,'UTF-8'));
+        $key=preg_replace('/\s+/u',' ',$value)??$value;
+        if(isset($translations[$key])) return $translations[$key];
+
+        foreach($translations as $source=>$translation){
+            $placeholder=':year';
+            $position=strpos($source,$placeholder);
+            if($position===false) continue;
+
+            $prefix=substr($source,0,$position);
+            $suffix=substr($source,$position+strlen($placeholder));
+            if(!str_starts_with($key,$prefix)||!str_ends_with($key,$suffix)) continue;
+
+            $year=substr($key,strlen($prefix),strlen($key)-strlen($prefix)-strlen($suffix));
+            if(preg_match('/^\d{4}$/',$year)) return str_replace($placeholder,$year,$translation);
+        }
+
+        return null;
     }
 }
