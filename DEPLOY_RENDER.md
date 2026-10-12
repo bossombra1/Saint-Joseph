@@ -1,76 +1,63 @@
-# Déployer Saint-Joseph sur Render
+# Déployer Saint-Joseph gratuitement sur Render
 
-Cette application est une application **Laravel 12 / PHP 8.4** avec assets Vite. Le dépôt contient un `Dockerfile` et un `render.yaml` pour créer un service web et un worker de file d’attente.
+Cette application est une application **Laravel 12 / PHP 8.4** avec assets Vite. Le dépôt contient un `Dockerfile` et un `render.yaml` configurés pour un **seul service web Render Free**, sans worker payant. La base PostgreSQL et le stockage des fichiers sont prévus sur Supabase.
 
-## 1. Préparer Supabase
+## 1. Créer le projet Supabase
 
-Le déploiement configuré utilise Supabase pour PostgreSQL et les fichiers téléversés.
+1. Créer un projet Supabase avec le forfait gratuit.
+2. Dans **Project Settings → Database**, récupérer les paramètres PostgreSQL. Utiliser le Session Pooler si la connexion directe ne fonctionne pas depuis Render.
+3. Créer un bucket Storage et récupérer les paramètres S3 (endpoint, Access Key ID et Secret Access Key).
+4. Ne jamais enregistrer les mots de passe ou clés dans GitHub.
 
-1. Créer un projet Supabase.
-2. Dans **Project Settings → Database**, récupérer les paramètres de connexion PostgreSQL. Utiliser de préférence le **Session Pooler** si le serveur Render ne peut pas joindre l’adresse directe IPv6.
-3. Créer un bucket Storage nommé, par exemple, `saint-joseph`. Le disque configuré dans Laravel utilise une URL publique pour les objets : régler le bucket comme public si les images doivent être accessibles sans authentification.
-4. Récupérer les identifiants S3 de Supabase Storage : endpoint S3, Access Key ID et Secret Access Key. Ne jamais mettre ces secrets dans GitHub.
+Attention : les limites et règles du forfait gratuit Supabase peuvent évoluer. Vérifier les limites affichées dans le tableau de bord Supabase.
 
-## 2. Créer les services Render
+## 2. Créer le service Render
 
-1. Ouvrir le tableau de bord Render : https://dashboard.render.com/
-2. Choisir **New → Blueprint** et connecter le dépôt `bossombra1/Saint-Joseph`.
-3. Pour tester les changements de déploiement avant intégration, sélectionner la branche `deploy/render-saint-joseph`. Après validation, fusionner la branche dans `main`.
-4. Render lira `render.yaml` et préparera le service web `saint-joseph-artisan` ainsi que le worker `saint-joseph-artisan-queue`.
-5. Le conteneur écoute sur le port `10000`; le health check utilise Laravel sur `/up`.
+1. Ouvrir https://dashboard.render.com/.
+2. Choisir **New → Blueprint** et connecter `bossombra1/Saint-Joseph`.
+3. Sélectionner la branche `deploy/free-render` pour tester cette configuration, puis utiliser `render.yaml`.
+4. Vérifier que le Blueprint ne propose qu'un seul service web nommé `saint-joseph-artisan` et que son plan est `free`.
+5. Ne pas ajouter de carte bancaire. Si Render demande toujours un moyen de paiement, annuler et vérifier que la branche et le fichier `render.yaml` sélectionnés sont bien ceux-ci.
 
-## 3. Renseigner les variables d’environnement
+Le conteneur écoute sur le port `10000`; le health check utilise `/up`.
 
-Les variables déclarées avec `sync: false` sont volontairement laissées hors du dépôt. Configure-les dans Render, **pour le service web et le worker**, avant de relancer les services.
+## 3. Renseigner les variables
 
-### Base de données (web + worker)
+Dans Render, renseigner les variables marquées comme non synchronisées (`sync: false`) pour le service web.
+
+### Base de données
 
 - `DB_CONNECTION=pgsql`
 - `DB_HOST` : hôte fourni par Supabase
-- `DB_PORT=5432` (ou le port indiqué par le pooler sélectionné)
+- `DB_PORT=5432`, ou le port indiqué par le pooler
 - `DB_DATABASE` : généralement `postgres`
-- `DB_USERNAME` et `DB_PASSWORD` : identifiants PostgreSQL fournis par Supabase
+- `DB_USERNAME` et `DB_PASSWORD` : identifiants fournis par Supabase
 - `DB_SSLMODE=require`
 
-Le premier démarrage du service web exécute `php artisan migrate --force`. **Vérifie que la base cible est la bonne et qu’elle contient une sauvegarde avant le premier démarrage** : les migrations modifient le schéma.
+Le conteneur exécute `php artisan migrate --force` au démarrage. Vérifier que le projet Supabase choisi est bien la base cible avant le premier démarrage.
 
-### URL et clé de l’application
+### URL et stockage
 
-- `APP_URL` : l’URL HTTPS exacte attribuée par Render au service web.
-- `APP_KEY` : Render la génère automatiquement pour le service web; le worker récupère cette même clé.
-
-Ne régénère pas `APP_KEY` après la mise en production : cela invaliderait notamment les sessions et les données chiffrées.
-
-### Stockage Supabase (web + worker)
-
-- `FILESYSTEM_DISK=supabase`
-- `SUPABASE_URL` : URL du projet Supabase, sans suffixe Storage
+- `APP_URL` : URL HTTPS exacte attribuée par Render
+- `SUPABASE_URL` : URL du projet
 - `SUPABASE_BUCKET` : nom du bucket
 - `SUPABASE_ENDPOINT` : endpoint S3 de Supabase Storage
 - `SUPABASE_ACCESS_KEY_ID` et `SUPABASE_SECRET_ACCESS_KEY` : identifiants S3
-- `SUPABASE_SERVICE_KEY` : clé de service si les fonctionnalités qui l’utilisent sont activées
+- `SUPABASE_SERVICE_KEY` : uniquement si les fonctionnalités de l'application en ont besoin
 
-Les fichiers locaux d’un service Render ne sont pas un stockage persistant. Vérifie donc le bucket et les identifiants avant d’utiliser les téléversements en production.
+Les fichiers locaux Render sont éphémères : les téléversements doivent bien utiliser le stockage Supabase. Configurer le bucket en public uniquement si les images doivent être visibles sans authentification.
 
-### Courriels et intégrations facultatives
+### E-mails et intégrations facultatives
 
-Pour envoyer des courriels, renseigner `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD` et `MAIL_FROM_ADDRESS`. Le blueprint utilise SMTP sur le port 587; adapte-le aux paramètres de ton fournisseur.
+Pour les e-mails, renseigner les variables `MAIL_*` avec les paramètres du fournisseur. Les clés `PAYMONGO_*`, `GROQ_API_KEY` et `OPENROUTER_API_KEY` ne sont nécessaires que si les intégrations correspondantes sont utilisées.
 
-Les clés `PAYMONGO_*`, `GROQ_API_KEY` et `OPENROUTER_API_KEY` sont nécessaires uniquement si les intégrations correspondantes sont utilisées. Configure les mêmes valeurs sur le worker lorsque les tâches en arrière-plan en ont besoin.
+## 4. Limites de la version gratuite
 
-## 4. Vérifier le déploiement
+- Le service web Render Free s'endort après 15 minutes sans trafic et peut prendre environ une minute à redémarrer.
+- Le système de fichiers local est éphémère : ne pas y conserver les fichiers téléversés ou une base SQLite.
+- La file d'attente Laravel est configurée sur `sync` afin de ne pas nécessiter de worker séparé. Les tâches sont exécutées pendant la requête web et peuvent donc ralentir certaines pages.
+- Le service gratuit convient aux essais et à un petit site, mais n'offre pas les garanties de disponibilité d'un hébergement payant.
 
-Après configuration des variables :
+## 5. Vérification
 
-1. Lancer ou relancer le déploiement du service web.
-2. Vérifier les logs de build Docker et de démarrage Laravel.
-3. Vérifier que le health check `/up` passe.
-4. Vérifier que les migrations sont terminées et que les tables `sessions`, `cache`, `jobs` et `failed_jobs` existent.
-5. Tester la page d’accueil, la connexion à l’administration, les formulaires, l’envoi d’e-mails et un téléversement d’image.
-6. Vérifier les logs du worker et envoyer une tâche en arrière-plan de test.
-
-## Notes importantes
-
-- Le blueprint crée un **worker séparé**; ce service peut entraîner un coût distinct selon le plan Render.
-- Les valeurs de base de données, les identifiants de stockage et les clés d’intégration ne doivent jamais être commitées.
-- Les changements de Docker et de configuration ont été préparés dans la branche `deploy/render-saint-joseph`; le déploiement réel et les tests d’intégration doivent être confirmés dans ton compte Render/Supabase.
+Après le déploiement, vérifier les logs, le health check `/up`, la page d'accueil, la connexion à l'administration, les formulaires, les e-mails et le téléversement d'images. Le site n'est pas considéré comme déployé tant que Render n'affiche pas un déploiement réussi et que l'URL n'a pas été testée.
