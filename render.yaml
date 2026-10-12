@@ -99,7 +99,7 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     # Do not consume queued jobs until the web service has applied all migrations.
-    startCommand: sh -c 'until php artisan migrate:status --pending --no-ansi 2>&1 | grep -q "No pending migrations"; do sleep 5; done; exec php artisan queue:work --tries=3 --timeout=60 --sleep=3'
+    dockerCommand: sh -c 'until php artisan migrate:status --pending --no-ansi 2>&1 | grep -q "No pending migrations"; do sleep 5; done; exec php artisan queue:work --tries=3 --timeout=60 --sleep=3'
     envVars:
       - key: APP_NAME
         value: "Paroisse Saint-Joseph Artisan"
