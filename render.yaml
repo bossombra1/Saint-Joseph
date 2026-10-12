@@ -2,6 +2,7 @@ services:
   - type: web
     name: saint-joseph-artisan
     runtime: docker
+    plan: free
     dockerfilePath: ./Dockerfile
     healthCheckPath: /up
     envVars:
@@ -49,8 +50,9 @@ services:
         value: database
       - key: SESSION_DRIVER
         value: database
+      # Free configuration: execute queued jobs synchronously (no paid worker).
       - key: QUEUE_CONNECTION
-        value: database
+        value: sync
       # Persistent uploads use Supabase Storage (S3-compatible).
       - key: FILESYSTEM_DISK
         value: supabase
@@ -69,95 +71,6 @@ services:
       - key: SUPABASE_ENDPOINT
         sync: false
       # Optional integrations; leave blank if the feature is not configured.
-      - key: PAYMONGO_SECRET_KEY
-        sync: false
-      - key: PAYMONGO_PUBLIC_KEY
-        sync: false
-      - key: PAYMONGO_WEBHOOK_SECRET
-        sync: false
-      - key: MAIL_MAILER
-        value: smtp
-      - key: MAIL_HOST
-        sync: false
-      - key: MAIL_PORT
-        value: "587"
-      - key: MAIL_USERNAME
-        sync: false
-      - key: MAIL_PASSWORD
-        sync: false
-      - key: MAIL_FROM_ADDRESS
-        sync: false
-      - key: MAIL_FROM_NAME
-        value: "Paroisse Saint-Joseph Artisan"
-      - key: GROQ_API_KEY
-        sync: false
-      - key: OPENROUTER_API_KEY
-        sync: false
-
-  - type: worker
-    name: saint-joseph-artisan-queue
-    runtime: docker
-    dockerfilePath: ./Dockerfile
-    # Do not consume queued jobs until the web service has applied all migrations.
-    dockerCommand: sh -c 'until php artisan migrate:status --pending --no-ansi 2>&1 | grep -q "No pending migrations"; do sleep 5; done; exec php artisan queue:work --tries=3 --timeout=60 --sleep=3'
-    envVars:
-      - key: APP_NAME
-        value: "Paroisse Saint-Joseph Artisan"
-      - key: APP_ENV
-        value: production
-      - key: APP_DEBUG
-        value: "false"
-      - key: APP_URL
-        sync: false
-      - key: APP_LOCALE
-        value: fr
-      - key: APP_FALLBACK_LOCALE
-        value: fr
-      - key: APP_FAKER_LOCALE
-        value: fr_FR
-      - key: LOG_LEVEL
-        value: info
-      - key: APP_KEY
-        fromService:
-          type: web
-          name: saint-joseph-artisan
-          envVarKey: APP_KEY
-      - key: DB_CONNECTION
-        value: pgsql
-      - key: DB_HOST
-        sync: false
-      - key: DB_PORT
-        value: "5432"
-      - key: DB_SSLMODE
-        value: require
-      - key: DB_DATABASE
-        sync: false
-      - key: DB_USERNAME
-        sync: false
-      - key: DB_PASSWORD
-        sync: false
-      - key: CACHE_STORE
-        value: database
-      - key: SESSION_DRIVER
-        value: database
-      - key: QUEUE_CONNECTION
-        value: database
-      - key: FILESYSTEM_DISK
-        value: supabase
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_SERVICE_KEY
-        sync: false
-      - key: SUPABASE_BUCKET
-        sync: false
-      - key: SUPABASE_ACCESS_KEY_ID
-        sync: false
-      - key: SUPABASE_SECRET_ACCESS_KEY
-        sync: false
-      - key: SUPABASE_REGION
-        value: us-east-1
-      - key: SUPABASE_ENDPOINT
-        sync: false
       - key: PAYMONGO_SECRET_KEY
         sync: false
       - key: PAYMONGO_PUBLIC_KEY
