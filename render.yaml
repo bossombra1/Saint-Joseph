@@ -12,9 +12,8 @@ services:
         value: production
       - key: APP_DEBUG
         value: "false"
-      # Set this to the exact public URL assigned by Render.
       - key: APP_URL
-        sync: false
+        value: https://saint-joseph-artisan.onrender.com
       - key: APP_LOCALE
         value: fr
       - key: APP_FALLBACK_LOCALE
@@ -67,7 +66,7 @@ services:
       - key: SUPABASE_SECRET_ACCESS_KEY
         sync: false
       - key: SUPABASE_REGION
-        value: us-east-1
+        value: eu-west-1
       - key: SUPABASE_ENDPOINT
         sync: false
       # Optional integrations; leave blank if the feature is not configured.
