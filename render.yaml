@@ -49,15 +49,12 @@ services:
         value: database
       - key: SESSION_DRIVER
         value: database
-      # Free configuration: execute queued jobs synchronously (no paid worker).
       - key: QUEUE_CONNECTION
         value: sync
       # Persistent uploads use Supabase Storage (S3-compatible).
       - key: FILESYSTEM_DISK
         value: supabase
       - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_SERVICE_KEY
         sync: false
       - key: SUPABASE_BUCKET
         sync: false
@@ -69,28 +66,5 @@ services:
         value: eu-west-1
       - key: SUPABASE_ENDPOINT
         sync: false
-      # Optional integrations; leave blank if the feature is not configured.
-      - key: PAYMONGO_SECRET_KEY
-        sync: false
-      - key: PAYMONGO_PUBLIC_KEY
-        sync: false
-      - key: PAYMONGO_WEBHOOK_SECRET
-        sync: false
-      - key: MAIL_MAILER
-        value: smtp
-      - key: MAIL_HOST
-        sync: false
-      - key: MAIL_PORT
-        value: "587"
-      - key: MAIL_USERNAME
-        sync: false
-      - key: MAIL_PASSWORD
-        sync: false
-      - key: MAIL_FROM_ADDRESS
-        sync: false
       - key: MAIL_FROM_NAME
         value: "Paroisse Saint-Joseph Artisan"
-      - key: GROQ_API_KEY
-        sync: false
-      - key: OPENROUTER_API_KEY
-        sync: false
