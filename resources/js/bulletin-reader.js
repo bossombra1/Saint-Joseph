@@ -1,8 +1,10 @@
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
-import workerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
+import PdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?worker&inline';
 import { PageFlip } from 'page-flip';
 
-GlobalWorkerOptions.workerSrc = workerUrl;
+// Inline the PDF.js worker in the Vite bundle so Nginx does not need to
+// serve a separate .mjs file with the correct JavaScript MIME type.
+GlobalWorkerOptions.workerPort = new PdfWorker();
 
 async function mountBulletinReader(root) {
     const bookElement = root.querySelector('[data-book-pages]');
