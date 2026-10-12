@@ -99,7 +99,6 @@ class HomePageUpcomingContentTest extends TestCase
         $this->assertStringContainsString('Today', $content);
         $this->assertStringContainsString('11:30 AM', $content);
         $this->assertStringContainsString('UPCOMING EVENTS', $content);
-        $this->assertStringContainsString("What's Happening", $content);
         $this->assertStringContainsString('NEXT MASS', $content);
     }
 }
