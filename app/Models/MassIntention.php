@@ -36,6 +36,27 @@ class MassIntention extends Model
         'preferred_date' => 'date',
     ];
 
+    /**
+     * Return mass times consistently in 24-hour format (e.g. 18:00, 06:30).
+     */
+    public function getFormattedMassTimeAttribute(): string
+    {
+        $value = trim((string) ($this->attributes['mass_time'] ?? ''));
+        if ($value === '') {
+            return '';
+        }
+
+        if (preg_match('/^(\\d{1,2})\\s*(?:h|:)\\s*(\\d{2})$/iu', $value, $matches)) {
+            return sprintf('%02d:%02d', (int) $matches[1], (int) $matches[2]);
+        }
+
+        try {
+            return \\Carbon\\Carbon::parse($value)->format('H:i');
+        } catch (\\Throwable $e) {
+            return $value;
+        }
+    }
+
     public function schedule()
     {
         return $this->belongsTo(MassSchedule::class, 'mass_schedule_id');
