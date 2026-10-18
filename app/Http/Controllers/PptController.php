@@ -207,7 +207,7 @@ class PptController extends Controller
             ], 500);
         }
 
-        $zip = new ZipArchive();
+        $zip = new \ZipArchive();
         $opened = $zip->open($temporaryFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 
         if ($opened !== true) {
