@@ -1,24 +1,22 @@
 <x-admin-layout>
-    <div x-data="pptAutomation()"
-         @keydown.window="handleKeyDown($event)"
-         @mousemove.window="onDrag($event)"
-         @mouseup.window="stopDrag()">
+    <div x-data="pptAutomation()">
     <div x-data="intentionList"
          data-ids='@json($intentions->pluck("id")->toArray())'
          data-batch-url="{{ route('admin.intentions.batch') }}"
          data-status-url="{{ route('admin.intentions.status', ':id') }}">
 
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-        <div>
-            <h1 class="font-heading text-3xl font-bold text-primary italic">Mass Intentions</h1>
-            <p class="text-sm text-muted-foreground mt-1">Review and manage mass intention submissions.</p>
+    <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 mb-8">
+        <div class="min-w-0">
+            <h1 class="font-heading text-3xl font-bold text-primary italic">Intentions de messe</h1>
+            <p class="text-sm text-muted-foreground mt-1">Consultez les intentions approuvées et téléchargez un document Word modifiable.</p>
         </div>
 
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-wrap items-center gap-2 xl:justify-end">
             @include('admin.ppt-tools-buttons')
-            <a href="{{ route('admin.intentions.create') }}" class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold text-xs shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
-                Create New
+            <a href="{{ route('admin.intentions.create') }}"
+               class="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold text-xs shadow-sm hover:opacity-90 transition-opacity whitespace-nowrap">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                Créer
             </a>
         </div>
     </div>
