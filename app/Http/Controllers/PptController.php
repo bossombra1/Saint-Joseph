@@ -16,7 +16,7 @@ class PptController extends Controller
         $today = now()->startOfDay();
         $selectedIds = array_values(array_filter((array) $request->query('ids', []), 'is_string'));
 
-        $query = MassIntention::query()->whereNotNull('preferred_date');
+        $query = MassIntention::query();
 
         if ($selectedIds !== []) {
             // An explicit selection always means exactly those rows, including past dates.
@@ -73,7 +73,7 @@ class PptController extends Controller
                         : $intention->full_name
                 ),
                 'type' => (string) $intention->intention_type,
-                'time' => (string) ($intention->mass_time ?? ''),
+                'time' => (string) ($intention->formatted_mass_time ?? ''),
             ];
         }
 
