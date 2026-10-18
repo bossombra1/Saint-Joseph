@@ -14,7 +14,7 @@
                         const data = await response.json();
                         
                         if (!data.slides || data.slides.length === 0) {
-                            this.showNotification('No approved intentions found for ' + data.date + '. Please ensure you have approved pending intentions first.', 'error');
+                            this.showNotification((document.documentElement.lang.startsWith('fr') ? 'Aucune intention approuvée trouvée pour ' : 'No approved intentions found for ') + data.date + (document.documentElement.lang.startsWith('fr') ? '. Veuillez d’abord approuver les intentions en attente.' : '. Please ensure you have approved pending intentions first.'), 'error');
                             return;
                         }
 
@@ -23,7 +23,7 @@
                         this.currentSlide = 0;
                         this.showPreview = true;
                     } catch (error) {
-                        this.showNotification('Error loading preview. Please ensure there are approved intentions.', 'error');
+                        this.showNotification(document.documentElement.lang.startsWith('fr') ? 'Erreur lors du chargement de l’aperçu. Vérifiez que des intentions ont été approuvées.' : 'Error loading preview. Please ensure there are approved intentions.', 'error');
                     }
                 },
                 async generateFinal() {
@@ -47,9 +47,9 @@
                         document.body.appendChild(a);
                         a.click();
                         a.remove();
-                        this.showNotification('PowerPoint presentation generated successfully!', 'success');
+                        this.showNotification(document.documentElement.lang.startsWith('fr') ? 'La présentation PowerPoint a été générée avec succès !' : 'PowerPoint presentation generated successfully!', 'success');
                     } catch (error) {
-                        this.showNotification('Error generating PPT. Please try again.', 'error');
+                        this.showNotification(document.documentElement.lang.startsWith('fr') ? 'Erreur lors de la génération du PowerPoint. Veuillez réessayer.' : 'Error generating PPT. Please try again.', 'error');
                     }
                 },
                 handleKeyDown(e) {
@@ -118,16 +118,16 @@
                         const data = await response.json();
 
                         if (!response.ok) {
-                            this.showNotification(data.message || 'Failed to create slides', 'error');
+                            this.showNotification(data.message || (document.documentElement.lang.startsWith('fr') ? 'Échec de la création des diapositives' : 'Failed to create slides'), 'error');
                             return;
                         }
 
                         if (data.success && data.url) {
-                            this.showNotification('Google Slide has been successfully created/updated!', 'success');
+                            this.showNotification(document.documentElement.lang.startsWith('fr') ? 'La présentation Google Slides a été créée ou mise à jour avec succès !' : 'Google Slide has been successfully created/updated!', 'success');
                             window.open(data.url, '_blank');
                         }
                     } catch (error) {
-                        this.showNotification('Error: ' + error.message, 'error');
+                        this.showNotification((document.documentElement.lang.startsWith('fr') ? 'Erreur : ' : 'Error: ') + error.message, 'error');
                     } finally {
                         this.creatingSlides = false;
                     }

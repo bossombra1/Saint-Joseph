@@ -171,10 +171,10 @@
                 <form method="POST" action="{{ route('logout') }}" id="logout-form">
                     @csrf
                     <button type="button" @click="$store.confirm.open({
-                        title: 'Confirm Logout',
-                        message: 'Are you sure you want to end your session?',
+                        title: @js(app()->getLocale() === 'fr' ? 'Confirmer la déconnexion' : 'Confirm Logout'),
+                        message: @js(app()->getLocale() === 'fr' ? 'Voulez-vous vraiment mettre fin à votre session ?' : 'Are you sure you want to end your session?'),
                         onConfirm: () => document.getElementById('logout-form').submit(),
-                        confirmText: 'Sign Out',
+                        confirmText: @js(app()->getLocale() === 'fr' ? 'Se déconnecter' : 'Sign Out'),
                         type: 'primary'
                     })"
                         class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[.06] text-white/50 hover:text-white/80 text-sm font-medium transition-all duration-200 group">

@@ -6,10 +6,11 @@ const ignoredElements = new Set(['CODE', 'PRE', 'SCRIPT', 'STYLE', 'TEXTAREA']);
 function translateTextNode(node) {
 	const value = node.nodeValue ?? '';
 	const trimmed = value.trim();
+	const lookup = trimmed.replace(/\s+/g, ' ');
 
-	if (!trimmed || !Object.hasOwn(frenchTranslations, trimmed)) return;
+	if (!trimmed || !Object.hasOwn(frenchTranslations, lookup)) return;
 
-	const translated = frenchTranslations[trimmed];
+	const translated = frenchTranslations[lookup];
 	if (translated === trimmed) return;
 
 	const leadingWhitespace = value.match(/^\s*/)?.[0] ?? '';
@@ -18,7 +19,7 @@ function translateTextNode(node) {
 }
 
 function translateElement(element) {
-	if (ignoredElements.has(element.tagName) || element.isContentEditable) return;
+	if (element.isContentEditable) return;
 
 	for (const attribute of translatableAttributes) {
 		const value = element.getAttribute(attribute);
@@ -26,6 +27,8 @@ function translateElement(element) {
 			element.setAttribute(attribute, frenchTranslations[value]);
 		}
 	}
+
+	if (ignoredElements.has(element.tagName)) return;
 
 	const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
 	while (walker.nextNode()) {
