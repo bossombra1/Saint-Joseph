@@ -70,22 +70,52 @@
             downloadingWord: false,
             previewData: { date: '', sections: [] },
 
+            selectedIntentionIds() {
+                const list = document.querySelector('[x-data="intentionList"]');
+                if (!list || !window.Alpine) return [];
+                try {
+                    const data = window.Alpine.$data(list);
+                    return Array.isArray(data.selected) ? data.selected.filter(Boolean) : [];
+                } catch (_) {
+                    return [];
+                }
+            },
+
+            async loadWordData() {
+                const ids = this.selectedIntentionIds();
+                const url = new URL('{{ route('admin.preview-ppt') }}', window.location.origin);
+                ids.forEach(id => url.searchParams.append('ids[]', id));
+
+                const response = await fetch(url.toString(), {
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                });
+                const raw = await response.text();
+                let data = {};
+                try { data = raw ? JSON.parse(raw) : {}; } catch (_) {}
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Impossible de charger les intentions (HTTP ' + response.status + ').');
+                }
+
+                this.previewData = {
+                    date: data.date || '',
+                    sections: Array.isArray(data.sections) ? data.sections : []
+                };
+                return this.previewData;
+            },
+
             async fetchPreview() {
                 try {
-                    const response = await fetch('{{ route('admin.preview-ppt') }}', {
-                        headers: { 'Accept': 'application/json' }
-                    });
-                    const data = await response.json().catch(() => ({}));
-                    if (!response.ok) {
-                        throw new Error(data.message || 'Impossible de charger l’aperçu.');
-                    }
-                    this.previewData = {
-                        date: data.date || '',
-                        sections: Array.isArray(data.sections) ? data.sections : []
-                    };
+                    await this.loadWordData();
                     this.showPreview = true;
                     if (!this.previewData.sections.length) {
-                        this.$store.toast.trigger('Aucune intention approuvée disponible.', 'error');
+                        this.$store.toast.trigger(
+                            this.selectedIntentionIds().length
+                                ? 'Aucune intention correspondante à la sélection.'
+                                : 'Aucune intention approuvée à partir d’aujourd’hui.',
+                            'error'
+                        );
                     }
                 } catch (error) {
                     this.$store.toast.trigger(error.message || 'Erreur lors du chargement de l’aperçu.', 'error');
@@ -96,9 +126,15 @@
                 if (this.downloadingWord) return;
                 this.downloadingWord = true;
                 try {
+                    await this.loadWordData();
+                    if (!this.previewData.sections.length) {
+                        throw new Error('Aucune intention à inclure dans le document Word.');
+                    }
+
                     const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
                     const response = await fetch('{{ route('admin.generate-ppt') }}', {
                         method: 'POST',
+                        credentials: 'same-origin',
                         headers: {
                             'Accept': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/json',
                             'Content-Type': 'application/json',
@@ -111,12 +147,20 @@
                     });
 
                     const contentType = response.headers.get('content-type') || '';
-                    if (!response.ok || contentType.includes('application/json')) {
-                        const data = await response.json().catch(() => ({}));
-                        throw new Error(data.message || 'La génération du document Word a échoué.');
+                    if (!response.ok || contentType.includes('application/json') || contentType.includes('text/html')) {
+                        const raw = await response.text();
+                        let data = {};
+                        try { data = raw ? JSON.parse(raw) : {}; } catch (_) {}
+                        const validationMessage = data.errors ? Object.values(data.errors).flat().join(' ') : '';
+                        throw new Error(
+                            data.message || validationMessage ||
+                            'La génération Word a échoué (HTTP ' + response.status + '). Consulte les journaux Laravel si le problème persiste.'
+                        );
                     }
 
                     const blob = await response.blob();
+                    if (!blob.size) throw new Error('Le serveur a renvoyé un document Word vide.');
+
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = url;
@@ -124,7 +168,7 @@
                     document.body.appendChild(link);
                     link.click();
                     link.remove();
-                    URL.revokeObjectURL(url);
+                    window.setTimeout(() => URL.revokeObjectURL(url), 1500);
                     this.$store.toast.trigger('Document Word téléchargé.', 'success');
                 } catch (error) {
                     this.$store.toast.trigger(error.message || 'Erreur lors du téléchargement Word.', 'error');
@@ -133,6 +177,5 @@
                 }
             }
         };
-    }
-</script>
+    }</script>
 @endonce
