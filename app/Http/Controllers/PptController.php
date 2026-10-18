@@ -106,7 +106,7 @@ class PptController extends Controller
         $dateLabel = $data['date'] ?? now()->format('d/m/Y');
 
         if (empty($sections)) {
-            $preview = $this->preview()->getData(true);
+            $preview = $this->preview($request)->getData(true);
             $sections = $preview['sections'] ?? [];
             $dateLabel = $data['date'] ?? ($preview['date'] ?? $dateLabel);
         }
