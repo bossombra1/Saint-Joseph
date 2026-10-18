@@ -11,47 +11,35 @@ class PptController extends Controller
     /**
      * Return the approved mass intentions used by the Word preview.
      */
-    public function preview()
+    public function preview(Request $request)
     {
         $today = now()->startOfDay();
+        $selectedIds = array_values(array_filter((array) $request->query('ids', []), 'is_string'));
 
-        $date = MassIntention::where('status', 'approved')
-            ->whereDate('preferred_date', $today)
-            ->value('preferred_date');
+        $query = MassIntention::query()->whereNotNull('preferred_date');
 
-        if (!$date) {
-            $date = MassIntention::where('status', 'approved')
-                ->whereDate('preferred_date', '>', $today)
-                ->orderBy('preferred_date')
-                ->value('preferred_date');
+        if ($selectedIds !== []) {
+            // An explicit selection always means exactly those rows, including past dates.
+            $query->whereIn('id', $selectedIds);
+        } else {
+            // With no selection, include approved intentions from today onward only.
+            $query->where('status', 'approved')
+                ->whereDate('preferred_date', '>=', $today);
         }
 
-        if (!$date) {
-            $date = MassIntention::where('status', 'approved')
-                ->whereDate('preferred_date', '<', $today)
-                ->orderByDesc('preferred_date')
-                ->value('preferred_date');
-        }
-
-        if (!$date) {
-            return response()->json([
-                'date' => $today->format('d/m/Y'),
-                'sections' => [],
-            ]);
-        }
-
-        $date = Carbon::parse($date)->startOfDay();
-
-        $intentions = MassIntention::where('status', 'approved')
-            ->whereDate('preferred_date', $date)
+        $records = $query->orderBy('preferred_date')
+            ->orderBy('mass_time')
             ->orderBy('created_at')
-            ->get()
-            ->groupBy('intention_type');
+            ->get();
 
         $sections = [];
 
-        foreach ($intentions as $type => $items) {
-            $typeLower = mb_strtolower((string) $type);
+        foreach ($records as $intention) {
+            $dateLabel = $intention->preferred_date
+                ? Carbon::parse($intention->preferred_date)->format('d/m/Y')
+                : 'Date non précisée';
+
+            $typeLower = mb_strtolower((string) $intention->intention_type);
 
             if (
                 str_contains($typeLower, 'thanksgiving')
@@ -69,29 +57,30 @@ class PptController extends Controller
                 $category = 'INTENTIONS SPÉCIALES';
             }
 
-            if (!isset($sections[$category])) {
-                $sections[$category] = [
-                    'category' => $category,
+            $sectionKey = $dateLabel . '|' . $category;
+            if (!isset($sections[$sectionKey])) {
+                $sections[$sectionKey] = [
+                    'category' => $dateLabel . ' — ' . $category,
                     'introduction' => '',
                     'items' => [],
                 ];
             }
 
-            foreach ($items as $intention) {
-                $sections[$category]['items'][] = [
-                    'name' => (string) (
-                        !empty($intention->raw_message)
-                            ? $intention->raw_message
-                            : $intention->full_name
-                    ),
-                    'type' => (string) $intention->intention_type,
-                    'time' => (string) ($intention->mass_time ?? ''),
-                ];
-            }
+            $sections[$sectionKey]['items'][] = [
+                'name' => (string) (
+                    !empty($intention->raw_message)
+                        ? $intention->raw_message
+                        : $intention->full_name
+                ),
+                'type' => (string) $intention->intention_type,
+                'time' => (string) ($intention->mass_time ?? ''),
+            ];
         }
 
         return response()->json([
-            'date' => $date->format('d/m/Y'),
+            'date' => $selectedIds !== []
+                ? 'Intentions sélectionnées'
+                : 'À partir du ' . $today->format('d/m/Y'),
             'sections' => array_values($sections),
         ]);
     }
