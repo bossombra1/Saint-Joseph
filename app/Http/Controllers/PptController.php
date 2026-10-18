@@ -219,7 +219,7 @@ class PptController extends Controller
         }
 
         $zip = new ZipArchive();
-        $opened = $zip->open($temporaryFile, ZipArchive::OVERWRITE);
+        $opened = $zip->open($temporaryFile, \\ZipArchive::CREATE | \\ZipArchive::OVERWRITE);
 
         if ($opened !== true) {
             @unlink($temporaryFile);
