@@ -1,10 +1,10 @@
 <?php
 
-namespace App\\Http\\Controllers;
+namespace App\Http\Controllers;
 
-use App\\Models\\MassIntention;
-use Carbon\\Carbon;
-use Illuminate\\Http\\Request;
+use App\Models\MassIntention;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class PptController extends Controller
 {
@@ -128,7 +128,7 @@ class PptController extends Controller
             ], 422);
         }
 
-        if (!class_exists(\\ZipArchive::class)) {
+        if (!class_exists(\ZipArchive::class)) {
             return response()->json([
                 'message' => 'L’extension PHP ZIP (ZipArchive) est absente. Active ext-zip dans PHP pour générer le fichier Word.',
             ], 500);
@@ -219,7 +219,7 @@ class PptController extends Controller
         }
 
         $zip = new ZipArchive();
-        $opened = $zip->open($temporaryFile, \\ZipArchive::CREATE | \\ZipArchive::OVERWRITE);
+        $opened = $zip->open($temporaryFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 
         if ($opened !== true) {
             @unlink($temporaryFile);
