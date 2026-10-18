@@ -20,7 +20,7 @@ class HomePageUpcomingContentTest extends TestCase
 
     public function test_homepage_shows_the_next_mass_and_only_upcoming_events_in_french(): void
     {
-        Carbon::setTestNow(Carbon::parse('2026-10-11 10:30:00', 'Asia/Manila'));
+        Carbon::setTestNow(Carbon::parse('2026-10-11 10:30:00', 'Africa/Abidjan'));
 
         MassSchedule::create([
             'title' => 'Sunday Mass',
@@ -61,7 +61,7 @@ class HomePageUpcomingContentTest extends TestCase
 
     public function test_homepage_includes_one_off_mass_schedules(): void
     {
-        Carbon::setTestNow(Carbon::parse('2026-10-11 10:30:00', 'Asia/Manila'));
+        Carbon::setTestNow(Carbon::parse('2026-10-11 10:30:00', 'Africa/Abidjan'));
 
         MassSchedule::create([
             'title' => 'Messe spéciale',
@@ -80,9 +80,30 @@ class HomePageUpcomingContentTest extends TestCase
         $this->assertStringContainsString('06:45', $content, 'The one-off mass time should use French formatting.');
     }
 
+    public function test_homepage_labels_next_morning_mass_as_tomorrow_late_at_night_in_abidjan(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-11 22:00:00', 'Africa/Abidjan'));
+
+        MassSchedule::create([
+            'title' => 'Messe en semaine',
+            'mass_type' => 'weekday',
+            'day_of_week' => ['Monday'],
+            'time' => ['6:30 AM'],
+            'is_active' => true,
+        ]);
+
+        $response = $this->withoutExceptionHandling()->get('/');
+        $content = $response->getContent();
+
+        $this->assertSame(200, $response->status());
+        $this->assertStringContainsString('Demain', $content, 'A 22 h à Abidjan, la messe de 06 h 30 le lendemain doit être affichée comme demain.');
+        $this->assertStringContainsString('06:30', $content, 'The next morning mass time should be shown.');
+        $this->assertStringNotContainsString('Aujourd’hui', $content, 'A mass scheduled for the next calendar day must not be labelled today.');
+    }
+
     public function test_homepage_uses_english_when_selected(): void
     {
-        Carbon::setTestNow(Carbon::parse('2026-10-12 10:30:00', 'Asia/Manila'));
+        Carbon::setTestNow(Carbon::parse('2026-10-12 10:30:00', 'Africa/Abidjan'));
 
         MassSchedule::create([
             'title' => 'Weekday Mass',
