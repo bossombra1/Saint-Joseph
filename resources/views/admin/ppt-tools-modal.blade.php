@@ -201,7 +201,7 @@
                     if (saved && saved.slides && saved.slides.length > 0) {
                         this.previewData = saved;
                         this.currentSlide = 0;
-                        this.showPreview = true;
+                        // Restore the saved draft silently; the user opens it with Preview Content.
                         this.hasUnsavedChanges = false;
                     }
                 } catch (e) { /* corrupted data, ignore */ }
@@ -214,12 +214,20 @@
 
             async fetchPreview() {
                 try {
-                    const response = await fetch('{{ route('admin.preview-ppt') }}');
-                    if (!response.ok) throw new Error('Failed to fetch');
-                    const data = await response.json();
+                    const response = await fetch('{{ route('admin.preview-ppt') }}', {
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    const data = await response.json().catch(() => ({}));
 
-                    if (!data.slides || data.slides.length === 0) {
-                        this.$store.toast.trigger('No approved intentions found for ' + data.date + '. Please ensure you have approved pending intentions first.', 'error');
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Impossible de charger l’aperçu.');
+                    }
+
+                    if (!Array.isArray(data.slides) || data.slides.length === 0) {
+                        this.$store.toast.trigger(
+                            'Aucune intention approuvée trouvée pour ' + (data.date || 'la date demandée') + '.',
+                            'error'
+                        );
                         return;
                     }
 
@@ -230,24 +238,33 @@
                     this.hasUnsavedChanges = false;
                     localStorage.removeItem(STORAGE_KEY);
                 } catch (error) {
-                    this.$store.toast.trigger('Error loading preview. Please ensure there are approved intentions.', 'error');
+                    this.$store.toast.trigger(error.message || 'Erreur lors du chargement de l’aperçu.', 'error');
                 }
             },
 
             async generateFinal() {
                 if (this.generatingPpt) return;
+                if (!Array.isArray(this.previewData.slides) || this.previewData.slides.length === 0) {
+                    this.$store.toast.trigger('Chargez d’abord un aperçu contenant des intentions approuvées.', 'error');
+                    return;
+                }
+
                 this.generatingPpt = true;
                 try {
                     const response = await fetch('{{ route('admin.generate-ppt') }}', {
                         method: 'POST',
                         headers: {
+                            'Accept': 'application/json',
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         },
                         body: JSON.stringify({ slides: this.previewData.slides })
                     });
 
-                    if (!response.ok) throw new Error('Generation failed');
+                    if (!response.ok) {
+                        const data = await response.json().catch(() => ({}));
+                        throw new Error(data.message || 'La génération du PowerPoint a échoué.');
+                    }
 
                     const blob = await response.blob();
                     const url = window.URL.createObjectURL(blob);
@@ -257,10 +274,11 @@
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
+                    window.URL.revokeObjectURL(url);
                     this.clearDraft();
-                    this.$store.toast.trigger('PowerPoint presentation generated successfully!', 'success');
+                    this.$store.toast.trigger('PowerPoint généré avec succès.', 'success');
                 } catch (error) {
-                    this.$store.toast.trigger('Error generating PPT. Please try again.', 'error');
+                    this.$store.toast.trigger(error.message || 'Erreur lors de la génération du PowerPoint.', 'error');
                 } finally {
                     this.generatingPpt = false;
                 }
