@@ -6,10 +6,11 @@ const ignoredElements = new Set(['CODE', 'PRE', 'SCRIPT', 'STYLE', 'TEXTAREA']);
 function translateTextNode(node) {
 	const value = node.nodeValue ?? '';
 	const trimmed = value.trim();
+	const lookup = trimmed.replace(/\\s+/g, ' ');
 
-	if (!trimmed || !Object.hasOwn(frenchTranslations, trimmed)) return;
+	if (!trimmed || !Object.hasOwn(frenchTranslations, lookup)) return;
 
-	const translated = frenchTranslations[trimmed];
+	const translated = frenchTranslations[lookup];
 	if (translated === trimmed) return;
 
 	const leadingWhitespace = value.match(/^\s*/)?.[0] ?? '';
