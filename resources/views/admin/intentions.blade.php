@@ -118,7 +118,7 @@
                             </td>
                             <td class="px-6 py-4 text-muted-foreground whitespace-nowrap">
                                 <span class="block font-bold text-primary">{{ (isset($intention->preferred_date) && $intention->preferred_date) ? $intention->preferred_date->format('M d, Y') : '—' }}</span>
-                                <span class="text-[10px] font-medium uppercase tracking-widest">{{ $intention->mass_time ?? 'No time set' }}</span>
+                                <span class="text-[10px] font-medium uppercase tracking-widest">{{ $intention->formatted_mass_time ?: 'Heure non définie' }}</span>
                             </td>
                             <td class="px-6 py-4">
                                 <x-admin-badge :status="$intention->status ?? 'pending'" data-status />
