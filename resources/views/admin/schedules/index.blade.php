@@ -47,16 +47,21 @@
                             ];
                             $days = is_array($s->day_of_week) ? $s->day_of_week : ($s->day_of_week ? [$s->day_of_week] : []);
                             $times = is_array($s->time) ? $s->time : ($s->time ? [$s->time] : []);
-                            $formattedTimes = array_map(function ($time) {
-                                if (!$time) return '';
+                            $typeKey = strtolower(trim((string) $s->mass_type));
+                            $formattedDays = array_map(function ($day) use ($dayLabels) {
+                                $key = strtolower(trim((string) $day));
+                                return $dayLabels[ucfirst($key)] ?? $dayLabels[$key] ?? ucfirst($key);
+                            }, $days);
+                            $formattedTimes = array_values(array_filter(array_map(function ($time) {
+                                if ($time === null || trim((string) $time) === '') return '';
                                 try { return \Carbon\Carbon::parse($time)->format('H:i'); }
-                                catch (\Throwable $e) { return $time; }
-                            }, array_filter($times));
+                                catch (\Throwable $e) { return trim((string) $time); }
+                            }, $times)));
                         @endphp
                         <tr class="hover:bg-[#F5F7FA]/60 transition-colors group">
                             <td class="px-6 py-4 font-bold text-primary text-[13px]">{{ $s->title ?: 'Horaire sans intitulé' }}</td>
-                            <td class="px-6 py-4 text-xs capitalize font-medium text-muted-foreground/70">{{ $typeLabels[strtolower($s->mass_type)] ?? ucfirst($s->mass_type) }}</td>
-                            <td class="px-6 py-4 text-xs">{{ $days ? implode(', ', array_map(fn ($day) => $dayLabels[$day] ?? $day, $days)) : '—' }}</td>
+                            <td class="px-6 py-4 text-xs capitalize font-medium text-muted-foreground/70">{{ $typeLabels[$typeKey] ?? ucfirst($typeKey) }}</td>
+                            <td class="px-6 py-4 text-xs">{{ $formattedDays ? implode(', ', $formattedDays) : '—' }}</td>
                             <td class="px-6 py-4 text-xs font-medium">{{ $formattedTimes ? implode(', ', $formattedTimes) : '—' }}</td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-[.1em] border {{ $s->is_active ? 'bg-blue-50 text-blue-600 border-blue-200/80' : 'bg-gray-50 text-gray-500 border-gray-200/80' }}">
