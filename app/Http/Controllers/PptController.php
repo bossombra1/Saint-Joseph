@@ -1,233 +1,288 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\\Http\\Controllers;
 
-use App\Models\MassIntention;
-use Illuminate\Http\Request;
-use PhpOffice\PhpPresentation\PhpPresentation;
-use PhpOffice\PhpPresentation\IOFactory;
-use PhpOffice\PhpPresentation\Style\Alignment;
+use App\\Models\\MassIntention;
+use Carbon\\Carbon;
+use Illuminate\\Http\\Request;
 
 class PptController extends Controller
 {
-    public function generate(Request $request)
-    {
-        $slidesData = $request->input('slides');
-
-        // Direct form submissions do not include slides. Build them from the
-        // same preview source used by the "Preview Content" button.
-        if (!is_array($slidesData) || count($slidesData) === 0) {
-            $previewData = $this->preview()->getData(true);
-            $slidesData = $previewData['slides'] ?? [];
-        }
-
-        if (!is_array($slidesData) || count($slidesData) === 0) {
-            return response()->json([
-                'message' => 'Aucune intention approuvée disponible. Vérifiez les intentions enregistrées et leur statut.',
-            ], 422);
-        }
-
-        foreach ($slidesData as $slideData) {
-            if (!is_array($slideData) || !isset($slideData['type'])) {
-                return response()->json([
-                    'message' => 'Les données de l’aperçu sont invalides. Rechargez l’aperçu puis réessayez.',
-                ], 422);
-            }
-
-            if (($slideData['type'] ?? null) === 'list' && !is_array($slideData['items'] ?? null)) {
-                return response()->json([
-                    'message' => 'Une diapositive contient une liste invalide. Rechargez l’aperçu puis réessayez.',
-                ], 422);
-            }
-        }
-
-        $presentation = new PhpPresentation();
-        $layout = new \PhpOffice\PhpPresentation\DocumentLayout();
-        $layout->setDocumentLayout(\PhpOffice\PhpPresentation\DocumentLayout::LAYOUT_SCREEN_16X9);
-        $presentation->getLayout()->setDocumentLayout($layout);
-
-        foreach ($slidesData as $s) {
-            $slide = $presentation->createSlide();
-            $background = new \PhpOffice\PhpPresentation\Slide\Background\Color();
-            $background->setColor(new \PhpOffice\PhpPresentation\Style\Color('FFFFFFFF'));
-            $slide->setBackground($background);
-
-            if (($s['type'] ?? '') === 'intro') {
-                $slide->createLineShape(20, 20, 930, 20)->getBorder()->getColor()->setARGB('FF000000');
-                $slide->createLineShape(20, 520, 930, 520)->getBorder()->getColor()->setARGB('FF000000');
-                $slide->createLineShape(20, 20, 20, 520)->getBorder()->getColor()->setARGB('FF000000');
-                $slide->createLineShape(930, 20, 930, 520)->getBorder()->getColor()->setARGB('FF000000');
-
-                $introText = $slide->createRichTextShape();
-                $introText->setHeight(300)->setWidth(800)
-                    ->setOffsetX($s['offsetX'] ?? 75)
-                    ->setOffsetY($s['offsetY'] ?? 100);
-                $introText->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-                $mainText = $introText->createTextRun(($s['mainText'] ?? '') . "\n");
-                $mainText->getFont()->setBold(true)->setSize(36)->setColor(new \PhpOffice\PhpPresentation\Style\Color('FF000000'));
-
-                $boldText = $introText->createTextRun(($s['boldText'] ?? '') . "\n");
-                $boldText->getFont()->setBold(true)->setSize(72)->setColor(new \PhpOffice\PhpPresentation\Style\Color('FFFF0000'));
-
-                $footerText = $introText->createTextRun($s['footerText'] ?? '');
-                $footerText->getFont()->setBold(true)->setSize(36)->setColor(new \PhpOffice\PhpPresentation\Style\Color('FF000000'));
-            } else {
-                $headerBar = $slide->createRichTextShape();
-                $headerBar->setHeight(50)->setWidth(950)->setOffsetX(0)->setOffsetY(0);
-                $headerBar->setFill(
-                    (new \PhpOffice\PhpPresentation\Style\Fill())
-                        ->setFillType(\PhpOffice\PhpPresentation\Style\Fill::FILL_SOLID)
-                        ->setStartColor(new \PhpOffice\PhpPresentation\Style\Color('FF000000'))
-                );
-                $headerBar->getActiveParagraph()->getAlignment()
-                    ->setHorizontal(Alignment::HORIZONTAL_CENTER)
-                    ->setVertical(Alignment::VERTICAL_CENTER);
-
-                $title = $headerBar->createTextRun($s['category'] ?? 'INTENTIONS');
-                $title->getFont()->setBold(true)->setSize(24)->setColor(new \PhpOffice\PhpPresentation\Style\Color('FFFFFFFF'));
-
-                $bodyShape = $slide->createRichTextShape();
-                $bodyShape->setHeight(420)->setWidth(850)
-                    ->setOffsetX($s['offsetX'] ?? 50)
-                    ->setOffsetY(($s['offsetY'] ?? 90) + 10);
-
-                foreach ($s['items'] as $item) {
-                    if (!is_array($item) || empty($item['name'])) {
-                        continue;
-                    }
-
-                    $paragraph = $bodyShape->createParagraph();
-                    $bullet = !empty($s['isRepose']) ? '+ ' : '• ';
-                    $nameRun = $paragraph->createTextRun($bullet . strtoupper((string) $item['name']));
-                    $nameRun->getFont()->setBold(true)->setSize(22)->setColor(new \PhpOffice\PhpPresentation\Style\Color('FF000080'));
-
-                    if (!empty($item['description'])) {
-                        $paragraph->createBreak();
-                        $descriptionRun = $paragraph->createTextRun('  (' . $item['description'] . ')');
-                        $descriptionRun->getFont()->setSize(16)->setItalic(true)->setColor(new \PhpOffice\PhpPresentation\Style\Color('FF666666'));
-                    }
-                }
-            }
-        }
-
-        // PhpPresentation starts with a blank slide; remove that initial slide.
-        $presentation->removeSlideByIndex(0);
-
-        $filename = 'Mass_Intentions_' . now()->format('Y-m-d') . '.pptx';
-        $writer = IOFactory::createWriter($presentation, 'PowerPoint2007');
-
-        return response()->streamDownload(
-            static function () use ($writer): void {
-                $writer->save('php://output');
-            },
-            $filename,
-            [
-                'Content-Type' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                'Cache-Control' => 'max-age=0',
-            ]
-        );
-    }
-
+    /**
+     * Return the approved mass intentions used by the Word preview.
+     */
     public function preview()
     {
         $today = now()->startOfDay();
 
-        $hasIntentionsToday = MassIntention::where('status', 'approved')
+        $date = MassIntention::where('status', 'approved')
             ->whereDate('preferred_date', $today)
-            ->exists();
+            ->value('preferred_date');
 
-        if ($hasIntentionsToday) {
-            $targetDate = $today;
-        } else {
-            // Prefer the next upcoming date with approved intentions.
-            $nextDate = MassIntention::where('status', 'approved')
+        if (!$date) {
+            $date = MassIntention::where('status', 'approved')
                 ->whereDate('preferred_date', '>', $today)
                 ->orderBy('preferred_date')
                 ->value('preferred_date');
-
-            if ($nextDate) {
-                $targetDate = \Carbon\Carbon::parse($nextDate)->startOfDay();
-            } else {
-                // If there are no future intentions, use the latest past date.
-                $lastDate = MassIntention::where('status', 'approved')
-                    ->whereDate('preferred_date', '<', $today)
-                    ->orderByDesc('preferred_date')
-                    ->value('preferred_date');
-
-                $targetDate = $lastDate
-                    ? \Carbon\Carbon::parse($lastDate)->startOfDay()
-                    : $today;
-            }
         }
 
+        if (!$date) {
+            $date = MassIntention::where('status', 'approved')
+                ->whereDate('preferred_date', '<', $today)
+                ->orderByDesc('preferred_date')
+                ->value('preferred_date');
+        }
+
+        if (!$date) {
+            return response()->json([
+                'date' => $today->format('d/m/Y'),
+                'sections' => [],
+            ]);
+        }
+
+        $date = Carbon::parse($date)->startOfDay();
+
         $intentions = MassIntention::where('status', 'approved')
-            ->whereDate('preferred_date', $targetDate)
+            ->whereDate('preferred_date', $date)
             ->orderBy('created_at')
             ->get()
             ->groupBy('intention_type');
 
-        $grouped = [];
-        foreach ($intentions as $type => $group) {
-            $typeLower = strtolower((string) $type);
-            $category = 'SPECIAL INTENTIONS';
+        $sections = [];
 
-            if (str_contains($typeLower, 'thanksgiving')) {
-                $category = 'THANKSGIVING';
-            } elseif (str_contains($typeLower, 'repose')) {
-                $category = 'ETERNAL REPOSE';
+        foreach ($intentions as $type => $items) {
+            $typeLower = mb_strtolower((string) $type);
+
+            if (
+                str_contains($typeLower, 'thanksgiving')
+                || str_contains($typeLower, 'action de grâce')
+                || str_contains($typeLower, 'action de grace')
+            ) {
+                $category = 'ACTIONS DE GRÂCE';
+            } elseif (
+                str_contains($typeLower, 'repose')
+                || str_contains($typeLower, 'défunt')
+                || str_contains($typeLower, 'defunt')
+            ) {
+                $category = 'PRIÈRES POUR LES DÉFUNTS';
+            } else {
+                $category = 'INTENTIONS SPÉCIALES';
             }
 
-            $grouped[$category] = ($grouped[$category] ?? collect())->concat($group);
-        }
+            if (!isset($sections[$category])) {
+                $sections[$category] = [
+                    'category' => $category,
+                    'introduction' => '',
+                    'items' => [],
+                ];
+            }
 
-        $slides = [];
-        foreach ($grouped as $category => $items) {
-            $isRepose = $category === 'ETERNAL REPOSE';
-            $isThanks = $category === 'THANKSGIVING';
-
-            $slides[] = [
-                'type' => 'intro',
-                'category' => $category,
-                'offsetX' => 75,
-                'offsetY' => 100,
-                'isRepose' => $isRepose,
-                'mainText' => $isRepose
-                    ? 'LASTLY, LET US PRAY FOR THE'
-                    : 'LET US JOIN OUR FELLOW PARISHIONERS IN THEIR',
-                'boldText' => $category,
-                'footerText' => $isRepose
-                    ? 'OF OUR DEPARTED LOVED ONES.'
-                    : ($isThanks
-                        ? 'FOR THE SPECIAL BLESSINGS AND GRACES RECEIVED FROM THE LORD.'
-                        : 'IN COMMEMORATING THEIR BIRTHDAYS, WEDDING ANNIVERSARIES AND PRAY FOR THEIR SPEEDY RECOVERY.'),
-            ];
-
-            foreach ($items->chunk(12) as $chunk) {
-                $slides[] = [
-                    'type' => 'list',
-                    'category' => $category . ($isThanks ? ' FOR THE BLESSINGS' : ''),
-                    'offsetX' => 50,
-                    'offsetY' => 90,
-                    'isRepose' => $isRepose,
-                    'items' => $chunk->map(static function ($intention) {
-                        return [
-                            'id' => $intention->id,
-                            'name' => strtoupper((string) (
-                                !empty($intention->raw_message)
-                                    ? $intention->raw_message
-                                    : $intention->full_name
-                            )),
-                            'description' => null,
-                        ];
-                    })->values()->toArray(),
+            foreach ($items as $intention) {
+                $sections[$category]['items'][] = [
+                    'name' => (string) (
+                        !empty($intention->raw_message)
+                            ? $intention->raw_message
+                            : $intention->full_name
+                    ),
+                    'type' => (string) $intention->intention_type,
+                    'time' => (string) ($intention->mass_time ?? ''),
                 ];
             }
         }
 
         return response()->json([
-            'date' => $targetDate->format('F d, Y'),
-            'slides' => $slides,
+            'date' => $date->format('d/m/Y'),
+            'sections' => array_values($sections),
         ]);
+    }
+
+    /**
+     * Generate a standard editable DOCX without relying on Composer's autoloader
+     * or PHPWord. A DOCX file is an Office Open XML package stored as a ZIP.
+     */
+    public function generate(Request $request)
+    {
+        $data = $request->validate([
+            'date' => ['nullable', 'string', 'max:30'],
+            'sections' => ['nullable', 'array'],
+            'sections.*.category' => ['required_with:sections', 'string', 'max:150'],
+            'sections.*.introduction' => ['nullable', 'string', 'max:3000'],
+            'sections.*.items' => ['required_with:sections', 'array'],
+            'sections.*.items.*.name' => ['required', 'string', 'max:1000'],
+            'sections.*.items.*.type' => ['nullable', 'string', 'max:150'],
+            'sections.*.items.*.time' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        $sections = $data['sections'] ?? [];
+        $dateLabel = $data['date'] ?? now()->format('d/m/Y');
+
+        if (empty($sections)) {
+            $preview = $this->preview()->getData(true);
+            $sections = $preview['sections'] ?? [];
+            $dateLabel = $data['date'] ?? ($preview['date'] ?? $dateLabel);
+        }
+
+        if (empty($sections)) {
+            return response()->json([
+                'message' => 'Aucune intention approuvée disponible pour créer le document Word.',
+            ], 422);
+        }
+
+        if (!class_exists(\\ZipArchive::class)) {
+            return response()->json([
+                'message' => 'L’extension PHP ZIP (ZipArchive) est absente. Active ext-zip dans PHP pour générer le fichier Word.',
+            ], 500);
+        }
+
+        $paragraphs = [];
+        $paragraphs[] = $this->wordParagraph('SAINT-JOSEPH ARTISAN', 'Subtitle', true, 12, '666666', 'center');
+        $paragraphs[] = $this->wordParagraph('INTENTIONS DE MESSE', 'Title', true, 20, '17322D', 'center');
+        $paragraphs[] = $this->wordParagraph('Date : ' . $dateLabel, null, true, 12, '000000', 'center');
+        $paragraphs[] = $this->wordParagraph('');
+
+        foreach ($sections as $section) {
+            $category = trim((string) ($section['category'] ?? 'INTENTIONS'));
+            $paragraphs[] = $this->wordParagraph($category, 'Heading1', true, 15, '17322D');
+
+            $introduction = trim((string) ($section['introduction'] ?? ''));
+            if ($introduction !== '') {
+                $paragraphs[] = $this->wordParagraph($introduction);
+            }
+
+            foreach (($section['items'] ?? []) as $item) {
+                $name = trim((string) ($item['name'] ?? ''));
+                if ($name === '') {
+                    continue;
+                }
+
+                $paragraphs[] = $this->wordParagraph('• ' . mb_strtoupper($name), null, true, 11, '000000');
+
+                $details = array_values(array_filter([
+                    trim((string) ($item['type'] ?? '')),
+                    trim((string) ($item['time'] ?? '')),
+                ], static fn ($value) => $value !== ''));
+
+                if ($details !== []) {
+                    $paragraphs[] = $this->wordParagraph('   ' . implode(' — ', $details), null, false, 9, '666666');
+                }
+            }
+
+            $paragraphs[] = $this->wordParagraph('');
+        }
+
+        $paragraphs[] = $this->wordParagraph('Document préparé par l’administration paroissiale.', null, false, 9, '777777');
+
+        $documentXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            . '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+            . '<w:body>' . implode('', $paragraphs)
+            . '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/>'
+            . '<w:pgMar w:top="1200" w:right="1400" w:bottom="1200" w:left="1400" w:header="708" w:footer="708" w:gutter="0"/>'
+            . '</w:sectPr></w:body></w:document>';
+
+        $contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            . '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+            . '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+            . '<Default Extension="xml" ContentType="application/xml"/>'
+            . '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'
+            . '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>'
+            . '</Types>';
+
+        $rootRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            . '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+            . '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>'
+            . '</Relationships>';
+
+        $documentRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            . '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+            . '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+            . '</Relationships>';
+
+        $stylesXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            . '<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+            . '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/>'
+            . '<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="22"/></w:rPr></w:style>'
+            . '<w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/>'
+            . '<w:pPr><w:jc w:val="center"/><w:spacing w:after="240"/></w:pPr>'
+            . '<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:color w:val="17322D"/><w:sz w:val="40"/></w:rPr></w:style>'
+            . '<w:style w:type="paragraph" w:styleId="Subtitle"><w:name w:val="Subtitle"/>'
+            . '<w:pPr><w:jc w:val="center"/></w:pPr><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr></w:style>'
+            . '<w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/>'
+            . '<w:pPr><w:keepNext/><w:spacing w:before="240" w:after="120"/></w:pPr>'
+            . '<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:color w:val="17322D"/><w:sz w:val="30"/></w:rPr></w:style>'
+            . '</w:styles>';
+
+        $temporaryFile = tempnam(sys_get_temp_dir(), 'mass-intentions-');
+        if ($temporaryFile === false) {
+            return response()->json([
+                'message' => 'Impossible de créer le fichier Word temporaire.',
+            ], 500);
+        }
+
+        $zip = new ZipArchive();
+        $opened = $zip->open($temporaryFile, ZipArchive::OVERWRITE);
+
+        if ($opened !== true) {
+            @unlink($temporaryFile);
+            return response()->json([
+                'message' => 'Impossible de préparer le fichier Word (ZIP).',
+            ], 500);
+        }
+
+        $zip->addFromString('[Content_Types].xml', $contentTypes);
+        $zip->addFromString('_rels/.rels', $rootRels);
+        $zip->addFromString('word/document.xml', $documentXml);
+        $zip->addFromString('word/_rels/document.xml.rels', $documentRels);
+        $zip->addFromString('word/styles.xml', $stylesXml);
+        $zip->close();
+
+        $filename = 'Intentions_de_messe_' . now()->format('Y-m-d') . '.docx';
+
+        return response()->streamDownload(
+            static function () use ($temporaryFile): void {
+                readfile($temporaryFile);
+                @unlink($temporaryFile);
+            },
+            $filename,
+            [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'Cache-Control' => 'no-store, no-cache, must-revalidate',
+                'Pragma' => 'no-cache',
+            ]
+        );
+    }
+
+    /**
+     * Build a safe WordprocessingML paragraph.
+     */
+    private function wordParagraph(
+        string $text,
+        ?string $style = null,
+        bool $bold = false,
+        int $fontSize = 11,
+        string $color = '000000',
+        ?string $alignment = null
+    ): string {
+        $pPr = '';
+        if ($style !== null) {
+            $pPr .= '<w:pStyle w:val="' . $style . '"/>';
+        }
+        if ($alignment !== null) {
+            $pPr .= '<w:jc w:val="' . $alignment . '"/>';
+        }
+        if ($pPr !== '') {
+            $pPr = '<w:pPr>' . $pPr . '</w:pPr>';
+        }
+
+        $runProperties = '<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/>';
+        if ($bold) {
+            $runProperties .= '<w:b/>';
+        }
+        $runProperties .= '<w:color w:val="' . $color . '"/><w:sz w:val="' . ($fontSize * 2) . '"/></w:rPr>';
+
+        $escaped = htmlspecialchars($text, ENT_XML1 | ENT_COMPAT, 'UTF-8');
+
+        return '<w:p>' . $pPr . '<w:r>' . $runProperties
+            . '<w:t xml:space="preserve">' . $escaped . '</w:t>'
+            . '</w:r></w:p>';
     }
 }
