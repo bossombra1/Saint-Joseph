@@ -1,12 +1,12 @@
 <?php
 
-namespace App\\Http\\Controllers;
+namespace App\Http\Controllers;
 
-use App\\Models\\MassIntention;
-use Illuminate\\Http\\Request;
-use PhpOffice\\PhpPresentation\\PhpPresentation;
-use PhpOffice\\PhpPresentation\\IOFactory;
-use PhpOffice\\PhpPresentation\\Style\\Alignment;
+use App\Models\MassIntention;
+use Illuminate\Http\Request;
+use PhpOffice\PhpPresentation\PhpPresentation;
+use PhpOffice\PhpPresentation\IOFactory;
+use PhpOffice\PhpPresentation\Style\Alignment;
 
 class PptController extends Controller
 {
@@ -42,14 +42,14 @@ class PptController extends Controller
         }
 
         $presentation = new PhpPresentation();
-        $layout = new \\PhpOffice\\PhpPresentation\\DocumentLayout();
-        $layout->setDocumentLayout(\\PhpOffice\\PhpPresentation\\DocumentLayout::LAYOUT_SCREEN_16X9);
+        $layout = new \PhpOffice\PhpPresentation\DocumentLayout();
+        $layout->setDocumentLayout(\PhpOffice\PhpPresentation\DocumentLayout::LAYOUT_SCREEN_16X9);
         $presentation->getLayout()->setDocumentLayout($layout);
 
         foreach ($slidesData as $s) {
             $slide = $presentation->createSlide();
-            $background = new \\PhpOffice\\PhpPresentation\\Slide\\Background\\Color();
-            $background->setColor(new \\PhpOffice\\PhpPresentation\\Style\\Color('FFFFFFFF'));
+            $background = new \PhpOffice\PhpPresentation\Slide\Background\Color();
+            $background->setColor(new \PhpOffice\PhpPresentation\Style\Color('FFFFFFFF'));
             $slide->setBackground($background);
 
             if (($s['type'] ?? '') === 'intro') {
@@ -64,28 +64,28 @@ class PptController extends Controller
                     ->setOffsetY($s['offsetY'] ?? 100);
                 $introText->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-                $mainText = $introText->createTextRun(($s['mainText'] ?? '') . "\\n");
-                $mainText->getFont()->setBold(true)->setSize(36)->setColor(new \\PhpOffice\\PhpPresentation\\Style\\Color('FF000000'));
+                $mainText = $introText->createTextRun(($s['mainText'] ?? '') . "\n");
+                $mainText->getFont()->setBold(true)->setSize(36)->setColor(new \PhpOffice\PhpPresentation\Style\Color('FF000000'));
 
-                $boldText = $introText->createTextRun(($s['boldText'] ?? '') . "\\n");
-                $boldText->getFont()->setBold(true)->setSize(72)->setColor(new \\PhpOffice\\PhpPresentation\\Style\\Color('FFFF0000'));
+                $boldText = $introText->createTextRun(($s['boldText'] ?? '') . "\n");
+                $boldText->getFont()->setBold(true)->setSize(72)->setColor(new \PhpOffice\PhpPresentation\Style\Color('FFFF0000'));
 
                 $footerText = $introText->createTextRun($s['footerText'] ?? '');
-                $footerText->getFont()->setBold(true)->setSize(36)->setColor(new \\PhpOffice\\PhpPresentation\\Style\\Color('FF000000'));
+                $footerText->getFont()->setBold(true)->setSize(36)->setColor(new \PhpOffice\PhpPresentation\Style\Color('FF000000'));
             } else {
                 $headerBar = $slide->createRichTextShape();
                 $headerBar->setHeight(50)->setWidth(950)->setOffsetX(0)->setOffsetY(0);
                 $headerBar->setFill(
-                    (new \\PhpOffice\\PhpPresentation\\Style\\Fill())
-                        ->setFillType(\\PhpOffice\\PhpPresentation\\Style\\Fill::FILL_SOLID)
-                        ->setStartColor(new \\PhpOffice\\PhpPresentation\\Style\\Color('FF000000'))
+                    (new \PhpOffice\PhpPresentation\Style\Fill())
+                        ->setFillType(\PhpOffice\PhpPresentation\Style\Fill::FILL_SOLID)
+                        ->setStartColor(new \PhpOffice\PhpPresentation\Style\Color('FF000000'))
                 );
                 $headerBar->getActiveParagraph()->getAlignment()
                     ->setHorizontal(Alignment::HORIZONTAL_CENTER)
                     ->setVertical(Alignment::VERTICAL_CENTER);
 
                 $title = $headerBar->createTextRun($s['category'] ?? 'INTENTIONS');
-                $title->getFont()->setBold(true)->setSize(24)->setColor(new \\PhpOffice\\PhpPresentation\\Style\\Color('FFFFFFFF'));
+                $title->getFont()->setBold(true)->setSize(24)->setColor(new \PhpOffice\PhpPresentation\Style\Color('FFFFFFFF'));
 
                 $bodyShape = $slide->createRichTextShape();
                 $bodyShape->setHeight(420)->setWidth(850)
@@ -100,12 +100,12 @@ class PptController extends Controller
                     $paragraph = $bodyShape->createParagraph();
                     $bullet = !empty($s['isRepose']) ? '+ ' : '• ';
                     $nameRun = $paragraph->createTextRun($bullet . strtoupper((string) $item['name']));
-                    $nameRun->getFont()->setBold(true)->setSize(22)->setColor(new \\PhpOffice\\PhpPresentation\\Style\\Color('FF000080'));
+                    $nameRun->getFont()->setBold(true)->setSize(22)->setColor(new \PhpOffice\PhpPresentation\Style\Color('FF000080'));
 
                     if (!empty($item['description'])) {
                         $paragraph->createBreak();
                         $descriptionRun = $paragraph->createTextRun('  (' . $item['description'] . ')');
-                        $descriptionRun->getFont()->setSize(16)->setItalic(true)->setColor(new \\PhpOffice\\PhpPresentation\\Style\\Color('FF666666'));
+                        $descriptionRun->getFont()->setSize(16)->setItalic(true)->setColor(new \PhpOffice\PhpPresentation\Style\Color('FF666666'));
                     }
                 }
             }
@@ -147,7 +147,7 @@ class PptController extends Controller
                 ->value('preferred_date');
 
             if ($nextDate) {
-                $targetDate = \\Carbon\\Carbon::parse($nextDate)->startOfDay();
+                $targetDate = \Carbon\Carbon::parse($nextDate)->startOfDay();
             } else {
                 // If there are no future intentions, use the latest past date.
                 $lastDate = MassIntention::where('status', 'approved')
@@ -156,7 +156,7 @@ class PptController extends Controller
                     ->value('preferred_date');
 
                 $targetDate = $lastDate
-                    ? \\Carbon\\Carbon::parse($lastDate)->startOfDay()
+                    ? \Carbon\Carbon::parse($lastDate)->startOfDay()
                     : $today;
             }
         }
