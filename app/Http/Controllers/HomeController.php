@@ -19,7 +19,7 @@ class HomeController extends Controller
                 ->get();
         });
 
-        $now = Carbon::now('Asia/Manila');
+        $now = Carbon::now('Africa/Abidjan');
         $nextMass = $this->findNextMass($now);
 
         $upcomingEvents = Event::where('is_published', true)

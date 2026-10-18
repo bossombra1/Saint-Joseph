@@ -2,7 +2,7 @@
 
 @php
     $isFrench = app()->getLocale() === 'fr';
-    $now = \Carbon\Carbon::now('Asia/Manila');
+    $now = \Carbon\Carbon::now('Africa/Abidjan');
     $isSunday = $now->dayOfWeek === \Carbon\Carbon::SUNDAY;
     $liveStart = $now->copy()->setTime(9, 55);
     $liveEnd = $now->copy()->setTime(11, 30);

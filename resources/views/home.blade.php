@@ -50,7 +50,7 @@
         <div class="hero-stats-strip animate-fade-in-up" style="display:flex;align-items:center;justify-content:center;gap:60px;padding:20px 32px;width:100%;max-width:440px;border-top:1px solid rgba(245,197,24,.15);border-radius:16px;background:rgba(255,255,255,0.04);backdrop-filter:blur(6px);animation-delay:.6s;">
             @php
             $foundedYear = 2010;
-            $yearsOfService = max(1, now('Asia/Manila')->year - $foundedYear);
+            $yearsOfService = max(1, now('Africa/Abidjan')->year - $foundedYear);
         @endphp
         @foreach([[$yearsOfService.'+','Years of Service'],['13','Weekly Masses']] as $stat)
             <div style="text-align:center;">
@@ -162,7 +162,7 @@
                                     if (!empty($t['date'])) $timeStr .= \Carbon\Carbon::parse($t['date'])->locale(app()->getLocale())->isoFormat('ll') . ' ';
                                     if (!empty($t['time'])) {
                                         try {
-                                            $timeStr .= \Carbon\Carbon::parse($t['time'], 'Asia/Manila')->locale(app()->getLocale())->isoFormat($isFrench ? 'HH:mm' : 'h:mm A');
+                                            $timeStr .= \Carbon\Carbon::parse($t['time'], 'Africa/Abidjan')->locale(app()->getLocale())->isoFormat($isFrench ? 'HH:mm' : 'h:mm A');
                                         } catch (\Throwable $exception) {
                                             $timeStr .= $t['time'];
                                         }
@@ -171,7 +171,7 @@
                                     return trim($timeStr);
                                 }
                                 try {
-                                    return \Carbon\Carbon::parse((string) $t, 'Asia/Manila')->locale(app()->getLocale())->isoFormat($isFrench ? 'HH:mm' : 'h:mm A');
+                                    return \Carbon\Carbon::parse((string) $t, 'Africa/Abidjan')->locale(app()->getLocale())->isoFormat($isFrench ? 'HH:mm' : 'h:mm A');
                                 } catch (\Throwable $exception) {
                                     return (string) $t;
                                 }
