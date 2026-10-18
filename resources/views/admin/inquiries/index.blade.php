@@ -1,6 +1,6 @@
 <x-admin-index 
     title="Service Inquiries" 
-    description="Review and validate sacramental inquiries from parishioners."
+    description="Examiner et valider les demandes relatives aux sacrements émanant des paroissiens."
     :headers="['Name', 'Type', 'Status', 'Date']"
 >
     @forelse($inquiries as $i)

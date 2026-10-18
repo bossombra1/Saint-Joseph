@@ -555,7 +555,7 @@
                 <p class="brand-subtitle">Staff Administration</p>
                 <div class="brand-divider"></div>
                 <p class="brand-quote">
-                    "The Holy Rosary is the storehouse of countless blessings."
+                    "Le Saint Rosaire est le trésor d'innombrables grâces."
                     <cite>— St. Louis de Montfort</cite>
                 </p>
             </div>
