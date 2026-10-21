@@ -100,6 +100,7 @@
                     const response = await fetch(endpoint, { headers: { 'Accept': 'application/json' }, cache: 'no-store' });
                     if (!response.ok) return;
                     const state = await response.json();
+                    window.dispatchEvent(new CustomEvent('live-mass:status', { detail: state }));
                     const active = state.is_live === true && Boolean(state.url);
                     banner.classList.toggle('hidden', !active);
                     banner.classList.toggle('flex', active);
