@@ -124,7 +124,7 @@
                 }
             };
             refreshLiveState();
-            window.setInterval(refreshLiveState, 10000);
+            window.setInterval(refreshLiveState, 5000);
         })();
         </script>
 
