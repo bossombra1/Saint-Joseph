@@ -146,73 +146,57 @@
             <p class="text-sm text-muted-foreground mt-1">Overview of parish activities and statistics.</p>
         </div>
 
-        @if(in_array(Auth::user()->role, ['super_admin','staff','soccom']))
-            {{-- Live Mass Banner --}}
-            <div class="bg-white rounded-2xl border border-black/[.04] shadow-sm shadow-black/[.02] p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 {{ \Illuminate\Support\Facades\Cache::get('manual_live_override') ? 'border-l-[3px] border-l-red-500' : '' }}">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-xl {{ \Illuminate\Support\Facades\Cache::get('manual_live_override') ? 'bg-red-50 text-red-500' : 'bg-[#F5F7FA] text-muted-foreground/40' }} flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
-                    </div>
-                    <div>
-                        <span class="text-[10px] font-black text-muted-foreground/50 uppercase tracking-[.15em]">Live Mass Override</span>
-                        <p class="text-sm mt-0.5 font-medium">
-                            @if(\Illuminate\Support\Facades\Cache::get('manual_live_override'))
-                                <span class="text-red-500 font-bold">● LIVE</span> — showing on the site now
-                            @else
-                                Not active. Click "Go Live" when Mass starts.
-                            @endif
-                        </p>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <form method="POST" action="{{ route('admin.live-mass.toggle') }}">
-                        @csrf<input type="hidden" name="state" value="on">
-                        <button class="px-5 py-2 rounded-xl bg-red-500 text-white text-[10px] font-black uppercase tracking-[.15em] shadow-lg shadow-red-500/20 hover:shadow-xl hover:shadow-red-500/30 transition-all active:scale-[0.97]">Go Live</button>
-                    </form>
-                    <form method="POST" action="{{ route('admin.live-mass.toggle') }}">
-                        @csrf<input type="hidden" name="state" value="off">
-                        <button class="px-5 py-2 rounded-xl bg-[#F5F7FA] text-muted-foreground/60 text-[10px] font-black uppercase tracking-[.15em] hover:bg-black/[.04] transition-all">End</button>
-                    </form>
-                </div>
-                <div class="w-full mt-4 pt-4 border-t border-black/[.04]">
-    <form method="POST" action="{{ route('admin.live-mass.facebook-link') }}" class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-        @csrf
-        <span class="text-[10px] font-black text-muted-foreground/50 uppercase tracking-[.15em] shrink-0">Facebook Live Link</span>
-        <input type="url" name="facebook_live_url" placeholder="https://www.facebook.com/.../videos/..."
-            value="{{ \Illuminate\Support\Facades\Cache::get(\App\Http\Controllers\FacebookLiveWebhookController::CACHE_KEY) }}"
-            class="flex-1 w-full text-sm px-3 py-2 rounded-lg border border-black/10 focus:outline-none focus:ring-2 focus:ring-primary/30">
-        <button type="submit" class="px-4 py-2 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-[.15em] hover:opacity-90 transition-all shrink-0">Save Link</button>
-    </form>
-    @if(\Illuminate\Support\Facades\Cache::get(\App\Http\Controllers\FacebookLiveWebhookController::CACHE_KEY))
-        <form method="POST" action="{{ route('admin.live-mass.facebook-link') }}" class="mt-2">
-            @csrf<input type="hidden" name="facebook_live_url" value="">
-            <button type="submit" class="text-[10px] font-bold text-red-500/70 hover:text-red-500 uppercase tracking-wider">Clear link</button>
-        </form>
-    @endif
-                </div>
-    @if(in_array(Auth::user()->role, ['super_admin','soccom']))
-                <div class="w-full mt-4 pt-4 border-t border-black/[.04]">
-                    <form method="POST" action="{{ route('admin.live-mass.platform') }}" class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                        @csrf
-                        <span class="text-[10px] font-black text-muted-foreground/50 uppercase tracking-[.15em] shrink-0">Live on</span>
-                        <div class="flex gap-3">
-                            @foreach(['youtube' => 'YouTube', 'facebook' => 'Facebook', 'both' => 'Both'] as $val => $label)
-                            <label class="flex items-center gap-1.5 cursor-pointer group">
-                                <input type="radio" name="platform" value="{{ $val }}"
-                                    {{ (\Illuminate\Support\Facades\Cache::get('live_mass_platform', 'both') === $val) ? 'checked' : '' }}
-                                    class="w-3 h-3 text-primary accent-primary border-black/20">
-                                <span class="text-[10px] font-bold uppercase tracking-[.15em] text-muted-foreground/60 group-hover:text-primary transition-colors">{{ $label }}</span>
-                            </label>
-                            @endforeach
-                        </div>
-                        <button type="submit" class="px-3 py-1.5 rounded-lg bg-primary text-white text-[10px] font-black uppercase tracking-[.15em] hover:opacity-90 transition-all shrink-0">Set Platform</button>
-                    </form>
-                </div>
-    @endif
-            </div>
-        @endif
-        
         @php $role = Auth::user()->role; @endphp
+
+        {{-- Live Mass Control --}}
+        @if(in_array($role, ['super_admin', 'staff', 'soccom'], true))
+            @php
+                $liveIsActive = \Illuminate\Support\Facades\Cache::get('manual_live_override', false) === true;
+                $savedLiveUrl = \Illuminate\Support\Facades\Cache::get('live_mass_url', '');
+                $savedLivePlatform = \Illuminate\Support\Facades\Cache::get('live_mass_platform', 'youtube');
+            @endphp
+            <section class="bg-white rounded-2xl border border-black/[.06] shadow-sm p-6 lg:p-8 mb-10">
+                <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="h-3 w-3 rounded-full {{ $liveIsActive ? 'bg-red-600 animate-pulse' : 'bg-gray-300' }}"></span>
+                            <h2 class="text-lg font-bold text-primary">Contrôle de la messe en direct</h2>
+                        </div>
+                        <p class="text-sm text-muted-foreground">{{ $liveIsActive ? 'Le direct est signalé comme actif sur le site public.' : 'Inactif. Enregistrez le lien, puis cliquez sur « Diffuser » au début de la messe.' }}</p>
+                        @if(session('success'))
+                            <p class="mt-3 text-sm font-semibold text-green-700">{{ session('success') }}</p>
+                        @endif
+                        @if($errors->has('live_url'))
+                            <p class="mt-3 text-sm font-semibold text-red-700">{{ $errors->first('live_url') }}</p>
+                        @endif
+                    </div>
+                    <form method="POST" action="{{ route('admin.live-mass.toggle') }}">
+                        @csrf
+                        <input type="hidden" name="state" value="{{ $liveIsActive ? 'off' : 'on' }}">
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 font-bold text-white shadow-lg transition hover:brightness-110 {{ $liveIsActive ? 'bg-gray-700' : 'bg-red-600' }}">
+                            <span class="h-2 w-2 rounded-full bg-white {{ $liveIsActive ? '' : 'animate-pulse' }}"></span>
+                            {{ $liveIsActive ? 'Arrêter le direct' : '🔴 Diffuser' }}
+                        </button>
+                    </form>
+                </div>
+                <form method="POST" action="{{ route('admin.live-mass.link') }}" class="mt-6 grid gap-4 md:grid-cols-[180px_minmax(0,1fr)_auto] items-end">
+                    @csrf
+                    <label class="block text-sm font-semibold text-primary">
+                        Plateforme
+                        <select name="platform" required class="mt-2 w-full rounded-xl border-gray-200">
+                            <option value="youtube" {{ $savedLivePlatform === 'youtube' ? 'selected' : '' }}>YouTube Live</option>
+                            <option value="facebook" {{ $savedLivePlatform === 'facebook' ? 'selected' : '' }}>Facebook Live</option>
+                        </select>
+                    </label>
+                    <label class="block text-sm font-semibold text-primary">
+                        Lien de la diffusion
+                        <input name="live_url" type="url" required value="{{ old('live_url', $savedLiveUrl) }}" placeholder="https://www.youtube.com/watch?v=..." class="mt-2 w-full rounded-xl border-gray-200" />
+                    </label>
+                    <button type="submit" class="rounded-xl border border-primary/10 bg-[#F5F7FA] px-5 py-3 font-bold text-primary hover:bg-gray-100">Enregistrer le lien</button>
+                </form>
+                <p class="mt-3 text-xs text-muted-foreground">Le bouton LIVE et la notification du site public se mettent à jour automatiquement. Le direct vidéo doit être lancé sur YouTube ou Facebook séparément.</p>
+            </section>
+        @endif
 
         {{-- Stats Grid --}}
         <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-10">
@@ -281,56 +265,6 @@
                 </div>
             @endif
         </div>
-
-        {{-- Live Mass Control --}}
-        @if(in_array($role, ['super_admin', 'staff', 'soccom'], true))
-            @php
-                $liveIsActive = \Illuminate\Support\Facades\Cache::get('manual_live_override', false) === true;
-                $savedLiveUrl = \Illuminate\Support\Facades\Cache::get('live_mass_url', '');
-                $savedLivePlatform = \Illuminate\Support\Facades\Cache::get('live_mass_platform', 'youtube');
-            @endphp
-            <section class="bg-white rounded-2xl border border-black/[.06] shadow-sm p-6 lg:p-8 mb-10">
-                <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
-                    <div>
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="h-3 w-3 rounded-full {{ $liveIsActive ? 'bg-red-600 animate-pulse' : 'bg-gray-300' }}"></span>
-                            <h2 class="text-lg font-bold text-primary">Contrôle de la messe en direct</h2>
-                        </div>
-                        <p class="text-sm text-muted-foreground">{{ $liveIsActive ? 'Le direct est signalé comme actif sur le site public.' : 'Inactif. Enregistrez le lien, puis cliquez sur « Diffuser » au début de la messe.' }}</p>
-                        @if(session('success'))
-                            <p class="mt-3 text-sm font-semibold text-green-700">{{ session('success') }}</p>
-                        @endif
-                        @if($errors->has('live_url'))
-                            <p class="mt-3 text-sm font-semibold text-red-700">{{ $errors->first('live_url') }}</p>
-                        @endif
-                    </div>
-                    <form method="POST" action="{{ route('admin.live-mass.toggle') }}">
-                        @csrf
-                        <input type="hidden" name="state" value="{{ $liveIsActive ? 'off' : 'on' }}">
-                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 font-bold text-white shadow-lg transition hover:brightness-110 {{ $liveIsActive ? 'bg-gray-700' : 'bg-red-600' }}">
-                            <span class="h-2 w-2 rounded-full bg-white {{ $liveIsActive ? '' : 'animate-pulse' }}"></span>
-                            {{ $liveIsActive ? 'Arrêter le direct' : '🔴 Diffuser' }}
-                        </button>
-                    </form>
-                </div>
-                <form method="POST" action="{{ route('admin.live-mass.link') }}" class="mt-6 grid gap-4 md:grid-cols-[180px_minmax(0,1fr)_auto] items-end">
-                    @csrf
-                    <label class="block text-sm font-semibold text-primary">
-                        Plateforme
-                        <select name="platform" required class="mt-2 w-full rounded-xl border-gray-200">
-                            <option value="youtube" {{ $savedLivePlatform === 'youtube' ? 'selected' : '' }}>YouTube Live</option>
-                            <option value="facebook" {{ $savedLivePlatform === 'facebook' ? 'selected' : '' }}>Facebook Live</option>
-                        </select>
-                    </label>
-                    <label class="block text-sm font-semibold text-primary">
-                        Lien de la diffusion
-                        <input name="live_url" type="url" required value="{{ old('live_url', $savedLiveUrl) }}" placeholder="https://www.youtube.com/watch?v=..." class="mt-2 w-full rounded-xl border-gray-200" />
-                    </label>
-                    <button type="submit" class="rounded-xl border border-primary/10 bg-[#F5F7FA] px-5 py-3 font-bold text-primary hover:bg-gray-100">Enregistrer le lien</button>
-                </form>
-                <p class="mt-3 text-xs text-muted-foreground">Le bouton LIVE et la notification du site public se mettent à jour automatiquement. Le direct vidéo doit être lancé sur YouTube ou Facebook séparément.</p>
-            </section>
-        @endif
 
         {{-- PPT Automation --}}
         <div class="bg-white rounded-2xl border border-black/[.04] shadow-sm shadow-black/[.02] p-6 lg:p-8 mb-10">
