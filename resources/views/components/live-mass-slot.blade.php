@@ -6,12 +6,26 @@
     $isSunday = $now->dayOfWeek === \Carbon\Carbon::SUNDAY;
     $liveStart = $now->copy()->setTime(9, 55);
     $liveEnd = $now->copy()->setTime(11, 30);
-    $isManualLive = \Illuminate\Support\Facades\Cache::get('manual_live_override', false);
-    $isLiveWindow = $isManualLive || ($isSunday && $now->gte($liveStart) && $now->lte($liveEnd));
+    $liveOverride = \Illuminate\Support\Facades\Cache::get('manual_live_override');
+    $isLiveWindow = $liveOverride === true || ($liveOverride === null && $isSunday && $now->gte($liveStart) && $now->lte($liveEnd));
     $facebookLivePermalink = \Illuminate\Support\Facades\Cache::get(
         \App\Http\Controllers\FacebookLiveWebhookController::CACHE_KEY
     );
+    $liveUrl = \Illuminate\Support\Facades\Cache::get('live_mass_url') ?: $facebookLivePermalink;
     $livePlatform = \Illuminate\Support\Facades\Cache::get('live_mass_platform', 'both');
+    $youtubeVideoId = null;
+    if ($liveUrl && $livePlatform === 'youtube') {
+        $liveHost = strtolower((string) parse_url($liveUrl, PHP_URL_HOST));
+        if (str_contains($liveHost, 'youtu.be')) {
+            $youtubeVideoId = trim((string) parse_url($liveUrl, PHP_URL_PATH), '/');
+        } else {
+            parse_str((string) parse_url($liveUrl, PHP_URL_QUERY), $liveQuery);
+            $youtubeVideoId = $liveQuery['v'] ?? null;
+            if (! $youtubeVideoId && preg_match('~/(?:live|embed)/([^/?]+)~', (string) parse_url($liveUrl, PHP_URL_PATH), $matches)) {
+                $youtubeVideoId = $matches[1];
+            }
+        }
+    }
 @endphp
 
 <section id="live-mass" class="max-w-5xl mx-auto px-6 mt-48 reveal reveal-up section-px-mobile">
@@ -39,7 +53,7 @@
         <div class="aspect-video bg-black">
             @if($livePlatform === 'youtube' || $livePlatform === 'both')
             <template x-if="activeTab === 'youtube'">
-                <iframe src="https://www.youtube-nocookie.com/embed/live_stream?channel={{ config('services.parish.youtube_channel_id') }}&autoplay=1&mute=1"
+                <iframe src="{{ $youtubeVideoId ? 'https://www.youtube-nocookie.com/embed/'.rawurlencode($youtubeVideoId).'?autoplay=1&mute=1' : 'about:blank' }}"
                     class="w-full h-full" frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowfullscreen loading="lazy"></iframe>
@@ -48,8 +62,8 @@
             @if($livePlatform === 'facebook' || $livePlatform === 'both')
             <template x-if="activeTab === 'facebook'">
                 <div class="w-full h-full" style="min-height:100%;">
-                    @if($facebookLivePermalink)
-                        <iframe src="https://www.facebook.com/plugins/video.php?href={{ urlencode($facebookLivePermalink) }}&show_text=false&autoplay=true&dnt=1"
+                    @if($liveUrl)
+                        <iframe src="https://www.facebook.com/plugins/video.php?href={{ urlencode($liveUrl) }}&show_text=false&autoplay=true&dnt=1"
                             class="w-full h-full" style="border:none;overflow:hidden;" scrolling="no" frameborder="0"
                             allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
                             allowfullscreen loading="lazy"></iframe>
