@@ -75,25 +75,58 @@
         
         <x-chatbot />
 
-        @php
-            $now = \Carbon\Carbon::now('Asia/Manila');
-            $isSunday = $now->dayOfWeek === \Carbon\Carbon::SUNDAY;
-            $liveStart = $now->copy()->setTime(9, 55);
-            $liveEnd = $now->copy()->setTime(11, 30);
-            $isLiveWindow = $isSunday && $now->gte($liveStart) && $now->lte($liveEnd);
-        @endphp
-        @if($isLiveWindow)
-        <style>#chatbot-widget{ bottom:4.5rem !important; }</style>
+        <style>
+            @keyframes livePulse { 0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(220,38,38,.45); } 50% { opacity:.72; box-shadow:0 0 0 8px rgba(220,38,38,0); } }
+            #live-mass-banner { animation: livePulse 1.2s infinite; }
+        </style>
+        <div id="live-mass-notice" class="fixed top-20 left-1/2 z-[110] hidden -translate-x-1/2 rounded-xl bg-red-700 px-5 py-3 text-center text-sm font-bold text-white shadow-2xl" role="status" aria-live="polite"></div>
         <a href="{{ url('/#live-mass') }}" id="live-mass-banner"
-           class="fixed bottom-0 left-0 right-0 z-[90] flex items-center justify-center gap-3 py-3 px-4 text-white font-bold text-sm tracking-wide shadow-lg transition-all hover:brightness-110"
+           class="fixed bottom-0 left-0 right-0 z-[90] hidden items-center justify-center gap-3 py-3 px-4 text-white font-bold text-sm tracking-wide shadow-lg transition-all hover:brightness-110"
            style="background:linear-gradient(135deg,#b91c1c 0%,#991b1b 100%);">
             <span class="h-2.5 w-2.5 rounded-full bg-white animate-pulse"></span>
-            <span class="font-cinzel text-xs tracking-[.2em] uppercase">Live Mass is streaming now</span>
+            <span class="font-cinzel text-xs tracking-[.2em] uppercase" data-live-label>🔴 EN DIRECT — Rejoignez la messe</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
         </a>
-        @endif
-
-
+        <script>
+        (() => {
+            const endpoint = @json(route('live-mass.status'));
+            const banner = document.getElementById('live-mass-banner');
+            const notice = document.getElementById('live-mass-notice');
+            const label = banner?.querySelector('[data-live-label]');
+            if (!banner || !notice || !label) return;
+            let previousState = null;
+            const refreshLiveState = async () => {
+                try {
+                    const response = await fetch(endpoint, { headers: { 'Accept': 'application/json' }, cache: 'no-store' });
+                    if (!response.ok) return;
+                    const state = await response.json();
+                    const active = state.is_live === true && Boolean(state.url);
+                    banner.classList.toggle('hidden', !active);
+                    banner.classList.toggle('flex', active);
+                    if (active) {
+                        label.textContent = state.platform === 'facebook' ? '🔴 EN DIRECT SUR FACEBOOK — Rejoignez la messe' : '🔴 EN DIRECT SUR YOUTUBE — Rejoignez la messe';
+                        banner.href = state.url;
+                        banner.target = '_blank';
+                        banner.rel = 'noopener noreferrer';
+                    } else {
+                        banner.href = @json(url('/#live-mass'));
+                        banner.removeAttribute('target');
+                        banner.removeAttribute('rel');
+                    }
+                    if (previousState === false && active) {
+                        notice.textContent = state.message || '🔴 La messe est en direct ! Cliquez pour nous rejoindre.';
+                        notice.classList.remove('hidden');
+                        window.setTimeout(() => notice.classList.add('hidden'), 9000);
+                    }
+                    previousState = active;
+                } catch (_) {
+                    // Keep the public page usable if the status endpoint is temporarily unavailable.
+                }
+            };
+            refreshLiveState();
+            window.setInterval(refreshLiveState, 10000);
+        })();
+        </script>
 
         <!-- Back to Top Button -->
         <button 
