@@ -30,6 +30,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/locale/{locale}', function (string $locale) { abort_unless(in_array($locale, ['fr','en'], true), 404); session(['locale'=>$locale]); return redirect()->back(); })->where('locale','fr|en')->name('locale.switch');
 
+Route::get('/api/live-mass/status', [LiveMassController::class, 'status'])->name('live-mass.status');
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', AboutController::class)->name('about');
 Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
