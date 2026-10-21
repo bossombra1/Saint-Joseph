@@ -282,6 +282,56 @@
             @endif
         </div>
 
+        {{-- Live Mass Control --}}
+        @if(in_array($role, ['super_admin', 'staff', 'soccom'], true))
+            @php
+                $liveIsActive = \\Illuminate\\Support\\Facades\\Cache::get('manual_live_override', false) === true;
+                $savedLiveUrl = \\Illuminate\\Support\\Facades\\Cache::get('live_mass_url', '');
+                $savedLivePlatform = \\Illuminate\\Support\\Facades\\Cache::get('live_mass_platform', 'youtube');
+            @endphp
+            <section class="bg-white rounded-2xl border border-black/[.06] shadow-sm p-6 lg:p-8 mb-10">
+                <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="h-3 w-3 rounded-full {{ $liveIsActive ? 'bg-red-600 animate-pulse' : 'bg-gray-300' }}"></span>
+                            <h2 class="text-lg font-bold text-primary">Contrôle de la messe en direct</h2>
+                        </div>
+                        <p class="text-sm text-muted-foreground">{{ $liveIsActive ? 'Le direct est signalé comme actif sur le site public.' : 'Inactif. Enregistrez le lien, puis cliquez sur « Diffuser » au début de la messe.' }}</p>
+                        @if(session('success'))
+                            <p class="mt-3 text-sm font-semibold text-green-700">{{ session('success') }}</p>
+                        @endif
+                        @if($errors->has('live_url'))
+                            <p class="mt-3 text-sm font-semibold text-red-700">{{ $errors->first('live_url') }}</p>
+                        @endif
+                    </div>
+                    <form method="POST" action="{{ route('admin.live-mass.toggle') }}">
+                        @csrf
+                        <input type="hidden" name="state" value="{{ $liveIsActive ? 'off' : 'on' }}">
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 font-bold text-white shadow-lg transition hover:brightness-110 {{ $liveIsActive ? 'bg-gray-700' : 'bg-red-600' }}">
+                            <span class="h-2 w-2 rounded-full bg-white {{ $liveIsActive ? '' : 'animate-pulse' }}"></span>
+                            {{ $liveIsActive ? 'Arrêter le direct' : '🔴 Diffuser' }}
+                        </button>
+                    </form>
+                </div>
+                <form method="POST" action="{{ route('admin.live-mass.link') }}" class="mt-6 grid gap-4 md:grid-cols-[180px_minmax(0,1fr)_auto] items-end">
+                    @csrf
+                    <label class="block text-sm font-semibold text-primary">
+                        Plateforme
+                        <select name="platform" required class="mt-2 w-full rounded-xl border-gray-200">
+                            <option value="youtube" {{ $savedLivePlatform === 'youtube' ? 'selected' : '' }}>YouTube Live</option>
+                            <option value="facebook" {{ $savedLivePlatform === 'facebook' ? 'selected' : '' }}>Facebook Live</option>
+                        </select>
+                    </label>
+                    <label class="block text-sm font-semibold text-primary">
+                        Lien de la diffusion
+                        <input name="live_url" type="url" required value="{{ old('live_url', $savedLiveUrl) }}" placeholder="https://www.youtube.com/watch?v=..." class="mt-2 w-full rounded-xl border-gray-200" />
+                    </label>
+                    <button type="submit" class="rounded-xl border border-primary/10 bg-[#F5F7FA] px-5 py-3 font-bold text-primary hover:bg-gray-100">Enregistrer le lien</button>
+                </form>
+                <p class="mt-3 text-xs text-muted-foreground">Le bouton LIVE et la notification du site public se mettent à jour automatiquement. Le direct vidéo doit être lancé sur YouTube ou Facebook séparément.</p>
+            </section>
+        @endif
+
         {{-- PPT Automation --}}
         <div class="bg-white rounded-2xl border border-black/[.04] shadow-sm shadow-black/[.02] p-6 lg:p-8 mb-10">
             <div class="flex flex-col md:flex-row items-center justify-between gap-6">
