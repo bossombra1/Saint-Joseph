@@ -251,6 +251,7 @@
                 </div>
             @endif
 
+            {{-- DONS DÉSACTIVÉS TEMPORAIREMENT — code conservé en commentaire.
             @if($role === 'super_admin' || $role === 'staff')
                 <div class="bg-white rounded-2xl border border-black/[.04] p-6 relative overflow-hidden group hover:shadow-md hover:shadow-black/[.04] transition-all duration-300">
                     <div class="stat-shine"></div>
@@ -264,6 +265,7 @@
                     <p class="text-[10px] font-bold text-muted-foreground/50 mt-2">{{ $stats['total_donation_count'] ?? 0 }} completed</p>
                 </div>
             @endif
+            --}}
         </div>
 
         {{-- PPT Automation --}}
@@ -530,6 +532,7 @@
                             <div class="text-[10px] text-muted-foreground/50 font-medium">Approve or reject submissions</div>
                         </div>
                     </a>
+                    {{-- DONS DÉSACTIVÉS TEMPORAIREMENT — code conservé en commentaire.
                     <a href="{{ route('admin.donations') }}"
                         class="bg-white border border-black/[.04] rounded-2xl p-5 hover:shadow-md hover:shadow-black/[.04] hover:border-emerald-300/40 transition-all duration-300 flex items-center gap-4 group">
                         <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -540,6 +543,7 @@
                             <div class="text-[10px] text-muted-foreground/50 font-medium">Track parish contributions</div>
                         </div>
                     </a>
+                    --}}
                 @endif
 
                 @if($role === 'super_admin' || $role === 'soccom')
