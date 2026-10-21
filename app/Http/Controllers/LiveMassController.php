@@ -1,10 +1,9 @@
 <?php
 
-namespace App\\Http\\Controllers;
+namespace App\Http\Controllers;
 
-use Illuminate\\Http\\Request;
-use Illuminate\\Support\\Facades\\Cache;
-use Illuminate\\Support\\Facades\\URL;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class LiveMassController extends Controller
 {
