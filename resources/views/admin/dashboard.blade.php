@@ -285,9 +285,9 @@
         {{-- Live Mass Control --}}
         @if(in_array($role, ['super_admin', 'staff', 'soccom'], true))
             @php
-                $liveIsActive = \\Illuminate\\Support\\Facades\\Cache::get('manual_live_override', false) === true;
-                $savedLiveUrl = \\Illuminate\\Support\\Facades\\Cache::get('live_mass_url', '');
-                $savedLivePlatform = \\Illuminate\\Support\\Facades\\Cache::get('live_mass_platform', 'youtube');
+                $liveIsActive = \Illuminate\Support\Facades\Cache::get('manual_live_override', false) === true;
+                $savedLiveUrl = \Illuminate\Support\Facades\Cache::get('live_mass_url', '');
+                $savedLivePlatform = \Illuminate\Support\Facades\Cache::get('live_mass_platform', 'youtube');
             @endphp
             <section class="bg-white rounded-2xl border border-black/[.06] shadow-sm p-6 lg:p-8 mb-10">
                 <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
