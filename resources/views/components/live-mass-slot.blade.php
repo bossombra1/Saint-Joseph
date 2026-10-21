@@ -160,3 +160,134 @@
         </div>
     @endif
 </section>
+
+<script>
+(() => {
+    const section = document.getElementById('live-mass');
+    if (!section) return;
+
+    const initialMarkup = section.innerHTML;
+    const serverInitiallyLive = @json((bool) $isLiveWindow);
+    const isFrench = @json($isFrench);
+    let lastSignature = null;
+    let activePlatform = null;
+
+    const youtubeIdFrom = (rawUrl) => {
+        try {
+            const url = new URL(rawUrl);
+            if (url.hostname.toLowerCase().includes('youtu.be')) {
+                return url.pathname.split('/').filter(Boolean)[0] || null;
+            }
+            const fromQuery = url.searchParams.get('v');
+            if (fromQuery) return fromQuery;
+            const match = url.pathname.match(/\/(?:live|embed|shorts)\/([^/?]+)/);
+            return match ? match[1] : null;
+        } catch (_) {
+            return null;
+        }
+    };
+
+    const makePlayer = (state, platform) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'rounded-3xl overflow-hidden';
+        wrap.style.cssText = 'background:#0d2a52;border:1px solid rgba(201,162,0,.22);box-shadow:0 12px 50px rgba(13,42,82,.09);';
+
+        const header = document.createElement('div');
+        header.className = 'px-6 md:px-10 py-5 flex items-center justify-between';
+        const title = document.createElement('div');
+        title.className = 'flex items-center gap-3';
+        title.innerHTML = '<span class="h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse"></span>';
+        const label = document.createElement('span');
+        label.className = 'font-cinzel font-semibold text-xs tracking-[.25em] uppercase text-white/80';
+        label.textContent = isFrench ? 'Messe en direct' : 'Live Mass';
+        title.appendChild(label);
+        header.appendChild(title);
+
+        const selectedPlatform = (platform === 'both') ? (activePlatform || 'youtube') : platform;
+        if (platform === 'both') {
+            const tabs = document.createElement('div');
+            tabs.className = 'flex items-center gap-1 bg-white/10 rounded-lg p-0.5 border border-white/10';
+            ['youtube', 'facebook'].forEach((name) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.textContent = name === 'youtube' ? 'YouTube' : 'Facebook';
+                button.className = 'px-3 py-1 text-[10px] font-bold rounded-md transition-all uppercase';
+                button.style.color = name === selectedPlatform ? '#0d2a52' : 'rgba(255,255,255,.6)';
+                button.style.background = name === selectedPlatform ? '#fff' : 'transparent';
+                button.addEventListener('click', () => {
+                    activePlatform = name;
+                    render(state, true);
+                });
+                tabs.appendChild(button);
+            });
+            header.appendChild(tabs);
+        } else {
+            const badge = document.createElement('span');
+            badge.className = 'px-3 py-1 text-[10px] font-bold rounded-md uppercase text-white/70 tracking-[.15em]';
+            badge.textContent = platform === 'youtube' ? 'YouTube' : 'Facebook';
+            header.appendChild(badge);
+        }
+
+        const videoBox = document.createElement('div');
+        videoBox.className = 'aspect-video bg-black';
+        const iframe = document.createElement('iframe');
+        iframe.className = 'w-full h-full';
+        iframe.setAttribute('allowfullscreen', '');
+        iframe.setAttribute('loading', 'eager');
+        iframe.setAttribute('title', isFrench ? 'Messe en direct' : 'Live Mass');
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+        iframe.setAttribute('frameborder', '0');
+
+        if (selectedPlatform === 'youtube') {
+            const videoId = youtubeIdFrom(state.url || '');
+            if (videoId) {
+                iframe.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(videoId) + '?autoplay=1&mute=1';
+                videoBox.appendChild(iframe);
+            } else {
+                const message = document.createElement('div');
+                message.className = 'flex h-full min-h-48 items-center justify-center px-6 text-center text-sm text-white/70';
+                message.textContent = isFrench ? 'Le lecteur YouTube n’est pas disponible pour ce lien. Ouvrez le direct.' : 'The YouTube player is unavailable for this link. Open the live stream.';
+                videoBox.appendChild(message);
+            }
+        } else if (selectedPlatform === 'facebook' && state.url) {
+            iframe.src = 'https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(state.url) + '&show_text=false&autoplay=true&dnt=1';
+            iframe.style.border = 'none';
+            iframe.style.overflow = 'hidden';
+            iframe.setAttribute('scrolling', 'no');
+            videoBox.appendChild(iframe);
+        }
+
+        wrap.appendChild(header);
+        wrap.appendChild(videoBox);
+        return wrap;
+    };
+
+    const render = (state, force = false) => {
+        const isLive = state && state.is_live === true && typeof state.url === 'string' && state.url.length > 0;
+        if (!isLive) {
+            if (lastSignature !== null) {
+                section.innerHTML = serverInitiallyLive
+                    ? '<div class="rounded-3xl bg-white p-8 text-center shadow-sm"><p class="font-semibold" style="color:#0d2a52;">' +
+                        (isFrench ? 'Le direct est terminé. La prochaine messe sera annoncée ici.' : 'The live stream has ended. The next Mass will be announced here.') +
+                        '</p></div>'
+                    : initialMarkup;
+                lastSignature = null;
+                activePlatform = null;
+            }
+            return;
+        }
+
+        const platform = ['youtube', 'facebook', 'both'].includes(state.platform) ? state.platform : 'facebook';
+        if (!activePlatform || (platform !== 'both' && activePlatform !== platform)) {
+            activePlatform = platform === 'both' ? 'youtube' : platform;
+        }
+        const signature = [state.url, platform, state.started_at || ''].join('|');
+        if (!force && signature === lastSignature) return;
+
+        section.replaceChildren(makePlayer(state, platform));
+        lastSignature = signature;
+    };
+
+    window.addEventListener('live-mass:status', (event) => render(event.detail));
+})();
+</script>
