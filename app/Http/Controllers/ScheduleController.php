@@ -10,11 +10,13 @@ use Illuminate\Support\Facades\Cache;
 class ScheduleController extends Controller
 {
     public function index()
-    {
-        $schedules = MassSchedule::orderByRaw('CAST(day_of_week AS TEXT)')->orderByRaw('CAST(time AS TEXT)')->get();
+{
+    $schedules = MassSchedule::orderByRaw('CAST(day_of_week AS CHAR)')
+        ->orderByRaw('CAST(time AS CHAR)')
+        ->get();
 
-        return view('admin.schedules.index', compact('schedules'));
-    }
+    return view('admin.schedules.index', compact('schedules'));
+}
 
     public function show(MassSchedule $schedule)
     {
